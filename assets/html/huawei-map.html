@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otopeni Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([44.5657, 26.0857], 12);
+        var markers = []; // Store markers for later management
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Function to calculate distance between two coordinates in kilometers
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            var R = 6371; // Earth's radius in kilometers
+            var dLat = ((lat2 - lat1) * Math.PI) / 180;
+            var dLon = ((lon2 - lon1) * Math.PI) / 180;
+            var a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos((lat1 * Math.PI) / 180) *
+                Math.cos((lat2 * Math.PI) / 180) *
+                Math.sin(dLon / 2) *
+                Math.sin(dLon / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        // Function to group locations into clusters based on proximity
+        function clusterLocations(locations, maxDistance) {
+            if (!maxDistance) maxDistance = 20;
+            var clusters = [];
+            var used = new Set();
+
+            for (var i = 0; i < locations.length; i++) {
+                if (used.has(i)) continue;
+
+                var cluster = [locations[i]];
+                used.add(i);
+
+                // Find all locations within maxDistance of the current location
+                for (var j = i + 1; j < locations.length; j++) {
+                    if (used.has(j)) continue;
+
+                    var distance = calculateDistance(
+                        locations[i].coords[0],
+                        locations[i].coords[1],
+                        locations[j].coords[0],
+                        locations[j].coords[1]
+                    );
+
+                    if (distance <= maxDistance) {
+                        cluster.push(locations[j]);
+                        used.add(j);
+                    }
+                }
+
+                clusters.push(cluster);
+            }
+
+            return clusters;
+        }
+
+        // Function to calculate camera position based on locations
+        function calculateCameraPosition(locations) {
+            if (locations.length === 0) {
+                // Default to Otopeni area
+                return {
+                    coords: [44.5657, 26.0857],
+                    zoom: 13
+                };
+            }
+
+            // If only one location, center on it
+            if (locations.length === 1) {
+                return {
+                    coords: locations[0].coords,
+                    zoom: 13
+                };
+            }
+
+            // Group locations into clusters
+            var clusters = clusterLocations(locations);
+
+            // Find the cluster with the most locations
+            var largestCluster = clusters.reduce(function (largest, current) {
+                return current.length > largest.length ? current : largest;
+            });
+
+            // Calculate the center point of the largest cluster
+            var latitudes = largestCluster.map(function (loc) { return loc.coords[0]; });
+            var longitudes = largestCluster.map(function (loc) { return loc.coords[1]; });
+
+            var centerLat = latitudes.reduce(function (sum, lat) { return sum + lat; }, 0) / latitudes.length;
+            var centerLng = longitudes.reduce(function (sum, lng) { return sum + lng; }, 0) / longitudes.length;
+
+            return {
+                coords: [centerLat, centerLng],
+                zoom: 12.5 // Set zoom to 12.5 as requested (equivalent to 13 in native maps)
+            };
+        }
+
+        // Function to create bullet point markers
+        function createMarkers(locations) {
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+
+            // Create new markers
+            locations.forEach(function (location, index) {
+                // Only create marker if coordinates are available
+                if (location.coords && location.coords.length === 2) {
+                    var popupContent = `<b>${location.name}</b><br>${location.experience}`;
+                    if (location.address) {
+                        popupContent += `<br><small style="color: #666;">${location.address}</small>`;
+                    }
+
+                    var marker = L.circleMarker(location.coords, {
+                        radius: 8,
+                        fillColor: '#6B3F1D',
+                        color: '#ffffff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(map)
+                        .bindPopup(popupContent)
+                        .on('mouseover', function (e) {
+                            this.openPopup();
+                        })
+                        .on('click', function (e) {
+                            // Send message to React Native when marker is clicked
+                            if (window.ReactNativeWebView) {
+                                window.ReactNativeWebView.postMessage(JSON.stringify({
+                                    type: 'markerClick',
+                                    locationId: location.id || location.name
+                                }));
+                            }
+                        });
+
+                    markers.push(marker);
+                } else {
+                    console.warn('Location missing coordinates:', location.name);
+                }
+            });
+        }
+
+        // Function to update map with new locations (called from React Native)
+        window.updateMapLocations = function (locations) {
+            if (locations && locations.length > 0) {
+                createMarkers(locations);
+
+                // Calculate camera position using clustering logic
+                var cameraPosition = calculateCameraPosition(locations);
+
+                // Set map view to focus on the area with most markers
+                map.setView(cameraPosition.coords, cameraPosition.zoom);
+            }
+        };
+
+        // Default locations (fallback if React Native doesn't inject data)
+        var defaultLocations = [
+            {
+                coords: [44.5657, 26.0857],
+                name: 'Otopeni Center',
+                experience: 'Main Otopeni area'
+            }
+        ];
+
+        // Initialize with default locations
+        createMarkers(defaultLocations);
+        // Set initial view for default location
+        map.setView(defaultLocations[0].coords, 12);
+
+        // Check if restaurant locations are already available (injected by React Native)
+        if (window.RESTAURANT_LOCATIONS) {
+            window.updateMapLocations(window.RESTAURANT_LOCATIONS);
+        }
+    </script>
+</body>
+
+</html>

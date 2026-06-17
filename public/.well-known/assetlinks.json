@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.sunnyasin.arena24",
+            "sha256_cert_fingerprints": [
+                "FD:C7:BD:52:D1:84:2C:B1:4F:43:D1:7A:E9:CB:35:58:E5:80:74:5F:EF:48:02:4B:34:A0:36:35:B9:30:AF:7F"
+            ]
+        }
+    }
+]

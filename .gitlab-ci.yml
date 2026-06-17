@@ -1,0 +1,78 @@
+stages:
+  - build
+
+# variables:
+#   NODE_VERSION: "20"
+
+# # Cache node_modules for faster builds
+# cache:
+#   paths:
+#     - node_modules/
+#     - ~/.npm
+
+# Build APK Stage
+build_apk:
+  stage: build
+  # image: node:20
+  before_script:
+    - set -e # Exit on any error
+    - echo "Checking Node.js version..."
+    - 'echo "Node.js version: $(node --version)"'
+    - echo "Checking eas version..."
+    - 'echo "EAS version: $(eas --version)"'
+    - node --version | grep -E "^v18\." || (echo "Node.js 18 required!" && exit 1)
+    - echo "Node.js 18 verified ✓"
+    - echo "Installing EAS CLI globally..."
+    - npm install -g eas-cli@latest
+    - eas --version || (echo "EAS 1 required!" && exit 1)
+    - echo "EAS verified ✓"
+    - npm ci
+
+    - echo "Validating jq installation..."
+    - jq --version || (echo "jq installation failed!" && exit 1)
+    - echo "jq verified ✓"
+
+    - echo "Authenticating with Expo using token..."
+    - 'echo "EXPO_TOKEN is set: $([ -n "$EXPO_TOKEN" ] && echo "Yes" || echo "No")"'
+    - eas whoami || (echo "Expo authentication failed!" && exit 1)
+    - echo "Authentication successful ✓"
+  script:
+    - echo "Starting APK build..."
+  #   - eas build --platform android --profile development --non-interactive --wait
+  #   - echo "Downloading APK..."
+  #   - echo "Getting latest build info..."
+  #   - eas build:list --platform android --limit 1 --json --non-interactive > latest_build.json
+  #   - cat latest_build.json
+  #   - ARTIFACT_URL=$(cat latest_build.json | jq -r '.[0].artifacts.buildUrl')
+  #   - 'echo "Artifact URL: $ARTIFACT_URL"'
+  #   - curl -L -o downloaded.apk "$ARTIFACT_URL"
+  #   - 'APK_NAME="arena-24-dev-$(date +%Y%m%d-%H%M%S)-${CI_COMMIT_SHORT_SHA}.apk"'
+  #   - 'mv downloaded.apk "$APK_NAME"'
+  #   - 'echo "APK ready: $APK_NAME"'
+  #   - echo "APK Information:"
+  #   - ls -lah "$APK_NAME"
+  #   - echo "Download from GitLab Artifacts after pipeline completes"
+  # artifacts:
+  #   paths:
+  #     - "arena-24-dev-*.apk"
+  #   name: "arena-24-apk-dev-$CI_COMMIT_SHORT_SHA"
+  #   expire_in: 1 year
+
+  only:
+    - dev
+# Optional: Quick notification job
+# notify_completion:
+#   stage: build
+#   image: alpine:latest
+#   script:
+#     - echo "Pipeline completed successfully!"
+#     - echo "APK built and available in artifacts"
+#     - 'echo "Branch: $CI_COMMIT_REF_NAME"'
+#     - 'echo "Commit: $CI_COMMIT_SHORT_SHA"'
+#     - 'echo "Time: $(date)"'
+#   needs:
+#     - job: build_apk
+#       artifacts: false
+#   only:
+#     - dev
+#   when: on_success
