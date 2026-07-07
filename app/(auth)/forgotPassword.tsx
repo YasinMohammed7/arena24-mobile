@@ -36,7 +36,7 @@ const ForgotPassword = () => {
   useEffect(() => {
     setForgotPasswordError(null);
     setForgotPasswordSuccess(false);
-  }, []);
+  }, [setForgotPasswordError, setForgotPasswordSuccess]);
 
   const handleSendPhone = async (data: ForgotPasswordFormData) => {
     const response = await forgotPassword(data.phone);
@@ -55,12 +55,12 @@ const ForgotPassword = () => {
   return (
     <View>
       {/* Title */}
-      <Text className="font-['Poppins-medium'] font-medium text-black text-center mb-2">
+      <Text className="mb-2 text-center font-['Poppins-medium'] font-medium text-black">
         {t("auth.forgotPasswordTitle")}
       </Text>
 
       {/* Subtitle */}
-      <Text className="font-['DM Sans'] text-sm font-light text-black text-center mb-6 px-4">
+      <Text className="font-['DM Sans'] mb-6 px-4 text-center text-sm font-light text-black">
         {t("auth.forgotPasswordSubtitle")}
       </Text>
 
@@ -80,7 +80,7 @@ const ForgotPassword = () => {
       {/* Error Message */}
       {forgotPasswordError && (
         <View className="mb-4">
-          <Text className="font-['DM Sans'] text-sm text-red-500 text-center">
+          <Text className="font-['DM Sans'] text-center text-sm text-red-500">
             {forgotPasswordError}
           </Text>
         </View>
@@ -92,7 +92,7 @@ const ForgotPassword = () => {
         disabled={!isValid || isLoading}
         className={`${
           isValid && !isLoading ? "bg-[#D38B5D]" : "bg-gray-400"
-        } rounded-[40px] py-3 items-center mb-6 flex-row justify-center`}
+        } mb-6 flex-row items-center justify-center rounded-[40px] py-3`}
       />
 
       <Button

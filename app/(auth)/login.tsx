@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormInput from "@/components/auth/FormInput";
 import PasswordInput from "@/components/auth/PasswordInput";
 import FormLabel from "@/components/auth/FormLabel";
-import { getLoginSchema, LoginFormData } from "@/schemas/authSchemas";
+import { getLoginSchema } from "@/schemas/authSchemas";
 import { useAuthStore } from "@/zustand/authStore";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -83,8 +83,8 @@ const LoginScreen = () => {
   return (
     <View>
       {loginError && (
-        <View className="mb-4 p-3 bg-red-50 rounded border border-red-200">
-          <Text className="text-red-600 text-sm text-center">{loginError}</Text>
+        <View className="mb-4 rounded border border-red-200 bg-red-50 p-3">
+          <Text className="text-center text-sm text-red-600">{loginError}</Text>
         </View>
       )}
       {/* Email and Password Fields */}
@@ -103,7 +103,7 @@ const LoginScreen = () => {
 
         {/* Password Field */}
         <View>
-          <View className="flex-row justify-between items-center">
+          <View className="flex-row items-center justify-between">
             <FormLabel
               label={t("auth.passwordLabel")}
               error={errors.password}
@@ -132,7 +132,7 @@ const LoginScreen = () => {
       {/* Action Button */}
       <Button
         text={isLoading ? t("common.loading") : t("auth.login")}
-        className={`rounded-[40px] py-3 items-center mb-6 ${
+        className={`mb-6 items-center rounded-[40px] py-3 ${
           isLoading ? "bg-gray-400" : "bg-[#D38B5D]"
         }`}
         onPress={handleFormSubmit}
@@ -140,7 +140,7 @@ const LoginScreen = () => {
       />
 
       {/* Bottom Text */}
-      <View className="flex-row justify-center items-center">
+      <View className="flex-row items-center justify-center">
         <Text className="font-['DM Sans'] text-base font-light text-black">
           {t("auth.dontHaveAccountYet")}{" "}
         </Text>

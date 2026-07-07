@@ -1,7 +1,10 @@
 import { View, StyleSheet } from "react-native";
-import { useLinkBuilder } from "@react-navigation/native";
-import { Text, PlatformPressable } from "@react-navigation/elements";
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import {
+  useLinkBuilder,
+  Text,
+  PlatformPressable,
+} from "expo-router/react-navigation";
+import { BottomTabBarProps } from "expo-router/js-tabs";
 
 export function TabBarNav({
   state,
@@ -20,8 +23,8 @@ export function TabBarNav({
               ? options.tabBarLabel
               : options.title || route.name
             : options.title !== undefined
-            ? options.title
-            : route.name;
+              ? options.title
+              : route.name;
 
         const isFocused = state.index === index;
 

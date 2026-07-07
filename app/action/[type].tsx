@@ -1,20 +1,20 @@
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, router } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
-import telegramService from '@/services/telegramService';
-import { useState } from 'react';
+import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useLocalSearchParams, router } from "expo-router";
+import { ArrowLeft } from "lucide-react-native";
+import { telegramService } from "@/services/telegramService";
+import { useState } from "react";
 // import ProgressStepsBar from "@/components/shared/ProgressStepsBar";
-import { ProgressStep, ProgressSteps } from 'react-native-progress-steps';
-import LocationsStep from '@/components/reservations/LocationsStep';
-import EventsStep from '@/components/reservations/EventsStep';
-import DatePickerStep from '@/components/reservations/DatePickerStep';
-import DetailsStep from '@/components/reservations/DetailsStep';
-import { useLocationsStore } from '@/zustand/locationsStore';
-import { useEventReservationStore } from '@/zustand/eventReservationStore';
-import { useDateReservationStore } from '@/zustand/dateReservationStore';
-import { useDetailsReservationStore } from '@/zustand/detailsReservationStore';
-import { useLanguage } from '@/hooks/useLanguage';
+import { ProgressStep, ProgressSteps } from "react-native-progress-steps";
+import LocationsStep from "@/components/reservations/LocationsStep";
+import EventsStep from "@/components/reservations/EventsStep";
+import DatePickerStep from "@/components/reservations/DatePickerStep";
+import DetailsStep from "@/components/reservations/DetailsStep";
+import { useLocationsStore } from "@/zustand/locationsStore";
+import { useEventReservationStore } from "@/zustand/eventReservationStore";
+import { useDateReservationStore } from "@/zustand/dateReservationStore";
+import { useDetailsReservationStore } from "@/zustand/detailsReservationStore";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export default function ActionScreen() {
   const { type } = useLocalSearchParams<{ type: string }>();
@@ -78,9 +78,9 @@ export default function ActionScreen() {
     setIsSubmitting(true);
 
     try {
-      let message = '';
+      let message = "";
 
-      if (type === 'event') {
+      if (type === "event") {
         // log all keys for event reservation store
         // console.log("Event reservation store:", {
         //   guestInput,
@@ -98,63 +98,63 @@ export default function ActionScreen() {
 
         // Format event reservation message
         const services = [];
-        if (needsStaff) services.push(t('reservations.staff'));
-        if (needsDJ) services.push(t('reservations.dj'));
-        if (needsValetParking) services.push(t('reservations.valetParking'));
-        if (needsSecurity) services.push(t('reservations.security'));
-        if (needsHostess) services.push(t('reservations.hostess'));
+        if (needsStaff) services.push(t("reservations.staff"));
+        if (needsDJ) services.push(t("reservations.dj"));
+        if (needsValetParking) services.push(t("reservations.valetParking"));
+        if (needsSecurity) services.push(t("reservations.security"));
+        if (needsHostess) services.push(t("reservations.hostess"));
 
         message = `
-🎉 <b>${t('reservations.myEvent').toUpperCase()}</b>
+🎉 <b>${t("reservations.myEvent").toUpperCase()}</b>
 
-🏪 <b>${t('reservations.location')}:</b> ${
-          location?.name || t('reservations.unknown')
+🏪 <b>${t("reservations.location")}:</b> ${
+          location?.name || t("reservations.unknown")
         }
-👥 <b>${t('reservations.guests')}:</b> ${guestInput}
-📅 <b>${t('reservations.selectDate')}:</b> ${
+👥 <b>${t("reservations.guests")}:</b> ${guestInput}
+📅 <b>${t("reservations.selectDate")}:</b> ${
           selectedDate
             ? new Date(selectedDate).toLocaleDateString(locale, {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
               })
-            : t('reservations.unspecified')
+            : t("reservations.unspecified")
         }
-⏰ <b>${t('reservations.schedule')}:</b> ${
-          isAllDay ? t('reservations.allDay') : t('reservations.partial')
+⏰ <b>${t("reservations.schedule")}:</b> ${
+          isAllDay ? t("reservations.allDay") : t("reservations.partial")
         }
-🎊 <b>${t('reservations.eventType')}:</b> ${
-          selectedEventType || t('reservations.unspecified')
+🎊 <b>${t("reservations.eventType")}:</b> ${
+          selectedEventType || t("reservations.unspecified")
         }
-💰 <b>${t('reservations.budget')}:</b> ${
-          selectedBudget || t('reservations.unspecified')
+💰 <b>${t("reservations.budget")}:</b> ${
+          selectedBudget || t("reservations.unspecified")
         }
 ${
   services.length > 0
-    ? `🛎️ <b>${t('reservations.additionalServices')}:</b> ${services.join(
-        ', '
+    ? `🛎️ <b>${t("reservations.additionalServices")}:</b> ${services.join(
+        ", "
       )}`
-    : ''
+    : ""
 }
 ${
   details?.name
-    ? `👤 <b>${t('reservations.contactName')}:</b> ${details.name}`
-    : ''
+    ? `👤 <b>${t("reservations.contactName")}:</b> ${details.name}`
+    : ""
 }
 ${
-  details?.phone ? `📞 <b>${t('reservations.phone')}:</b> ${details.phone}` : ''
+  details?.phone ? `📞 <b>${t("reservations.phone")}:</b> ${details.phone}` : ""
 }
 ${
   details?.specialRequirements
-    ? `📝 <b>${t('reservations.specialRequests')}:</b> ${
+    ? `📝 <b>${t("reservations.specialRequests")}:</b> ${
         details.specialRequirements
       }`
-    : ''
+    : ""
 }
 
-⏰ <b>${t('reservations.requestSentAt')}:</b> ${new Date().toLocaleString(
-          'ro-RO'
+⏰ <b>${t("reservations.requestSentAt")}:</b> ${new Date().toLocaleString(
+          "ro-RO"
         )}
         `.trim();
       } else {
@@ -169,58 +169,58 @@ ${
 
         // Format location reservation message
         message = `
-🍽️ <b>${t('reservations.tableReservation').toUpperCase()}</b>
+🍽️ <b>${t("reservations.tableReservation").toUpperCase()}</b>
 
-🏪 <b>${t('reservations.location')}:</b> ${
-          location?.name || t('reservations.unknown')
+🏪 <b>${t("reservations.location")}:</b> ${
+          location?.name || t("reservations.unknown")
         }
-👥 <b>${t('reservations.numberOfPeople')}:</b> ${selectedNumber}
-📅 <b>${t('reservations.selectDate')}:</b> ${
+👥 <b>${t("reservations.numberOfPeople")}:</b> ${selectedNumber}
+📅 <b>${t("reservations.selectDate")}:</b> ${
           selectedDate
             ? new Date(selectedDate).toLocaleDateString(locale, {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
               })
-            : t('reservations.unspecified')
+            : t("reservations.unspecified")
         }
-⏰ <b>${t('reservations.timeSlot')}:</b> ${
-          selectedTimeSlotId || t('reservations.unspecified')
+⏰ <b>${t("reservations.timeSlot")}:</b> ${
+          selectedTimeSlotId || t("reservations.unspecified")
         }
 ${
   details?.name
-    ? `👤 <b>${t('reservations.contactName')}:</b> ${details.name}`
-    : ''
+    ? `👤 <b>${t("reservations.contactName")}:</b> ${details.name}`
+    : ""
 }
 ${
-  details?.phone ? `📞 <b>${t('reservations.phone')}:</b> ${details.phone}` : ''
+  details?.phone ? `📞 <b>${t("reservations.phone")}:</b> ${details.phone}` : ""
 }
 ${
   details?.specialRequirements
-    ? `📝 <b>${t('reservations.specialRequests')}:</b> ${
+    ? `📝 <b>${t("reservations.specialRequests")}:</b> ${
         details.specialRequirements
       }`
-    : ''
+    : ""
 }
 
-⏰ <b>${t('reservations.requestSentAt')}:</b> ${new Date().toLocaleString(
-          'ro-RO'
+⏰ <b>${t("reservations.requestSentAt")}:</b> ${new Date().toLocaleString(
+          "ro-RO"
         )}
         `.trim();
       }
 
       // Find specific group for the location/restaurant
-      const restaurantName = location?.name || 'Arena 24';
+      const restaurantName = location?.name || "Arena 24";
       const groupChatId = await telegramService.findGroupByName(restaurantName);
       const targetChatId =
-        groupChatId || process.env.EXPO_PUBLIC_TELEGRAM_CHAT_ID || '';
+        groupChatId || process.env.EXPO_PUBLIC_TELEGRAM_CHAT_ID || "";
 
       // Send telegram message to specific group or fallback to default
       const response = await telegramService.sendMessage({
         chat_id: targetChatId,
         text: message,
-        parse_mode: 'HTML',
+        parse_mode: "HTML",
       });
 
       if (response.ok) {
@@ -231,22 +231,22 @@ ${
         clearSelectedLocation();
 
         Alert.alert(
-          t('reservations.success'),
-          t('reservations.successMessage'),
+          t("reservations.success"),
+          t("reservations.successMessage"),
           [
             {
-              text: t('common.ok'),
-              onPress: () => router.back() ?? router.replace('/'),
+              text: t("common.ok"),
+              onPress: () => router.back() ?? router.replace("/"),
             },
           ]
         );
       } else {
-        throw new Error(response.description || t('reservations.errorMessage'));
+        throw new Error(response.description || t("reservations.errorMessage"));
       }
     } catch (error: any) {
-      console.error('Error submitting reservation:', error);
-      Alert.alert(t('reservations.error'), t('reservations.errorMessage'), [
-        { text: t('common.ok') },
+      console.error("Error submitting reservation:", error);
+      Alert.alert(t("reservations.error"), t("reservations.errorMessage"), [
+        { text: t("common.ok") },
       ]);
     } finally {
       setIsSubmitting(false);
@@ -254,95 +254,95 @@ ${
   };
 
   const handleBack = () => {
-    router.back() ?? router.replace('/');
+    router.back() ?? router.replace("/");
   };
 
   const progressStepsConfig = {
     topOffset: 20,
-    activeStepIconBorderColor: '#D38B5D',
-    completedProgressBarColor: '#D38B5D',
-    activeLabelColor: '#492800',
-    completedLabelColor: '#99621E',
-    disabledStepIconColor: '#F9EDE6',
-    labelColor: 'rgba(73, 40, 0, 0.3)',
-    activeStepIconColor: '#D38B5D',
-    completedStepIconColor: '#D38B5D',
-    progressBarColor: '#F9EDE6',
+    activeStepIconBorderColor: "#D38B5D",
+    completedProgressBarColor: "#D38B5D",
+    activeLabelColor: "#492800",
+    completedLabelColor: "#99621E",
+    disabledStepIconColor: "#F9EDE6",
+    labelColor: "rgba(73, 40, 0, 0.3)",
+    activeStepIconColor: "#D38B5D",
+    completedStepIconColor: "#D38B5D",
+    progressBarColor: "#F9EDE6",
     borderWidth: 2,
-    activeStepNumColor: '#FFFFFF',
-    completedStepNumColor: '#FFFFFF',
-    disabledStepNumColor: 'rgba(73, 40, 0, 0.5)',
+    activeStepNumColor: "#FFFFFF",
+    completedStepNumColor: "#FFFFFF",
+    disabledStepNumColor: "rgba(73, 40, 0, 0.5)",
   };
 
   const buttonConfig = {
-    buttonFillColor: '#D38B5D',
-    buttonBorderColor: '#D38B5D',
-    buttonNextTextColor: '#FFFFFF',
-    buttonPreviousTextColor: '#D38B5D',
-    buttonFinishTextColor: '#FFFFFF',
+    buttonFillColor: "#D38B5D",
+    buttonBorderColor: "#D38B5D",
+    buttonNextTextColor: "#FFFFFF",
+    buttonPreviousTextColor: "#D38B5D",
+    buttonFinishTextColor: "#FFFFFF",
     buttonTopOffset: 20,
     buttonBottomOffset: 20,
     buttonHorizontalOffset: 20,
   };
 
   return (
-    <SafeAreaView className='flex-1 px-3 mt-4 bg-white'>
-      <View className='flex flex-row items-center justify-center relative'>
+    <SafeAreaView className="mt-4 flex-1 bg-white px-3">
+      <View className="relative flex flex-row items-center justify-center">
         {/* Back Button - positioned to the left */}
         <TouchableOpacity
           onPress={handleBack}
-          className='absolute left-0 bg-[#492800]/5 rounded-[30px] p-2'
+          className="absolute left-0 rounded-[30px] bg-[#492800]/5 p-2"
         >
-          <ArrowLeft size={20} color='#492800' />
+          <ArrowLeft size={20} color="#492800" />
         </TouchableOpacity>
 
         {/* Title Text - centered */}
-        <Text className="font-['poppins-regular'] text-lg text-[#492800] font-medium">
-          {type === 'location'
-            ? t('reservations.bookTable')
-            : t('reservations.myEvent')}
+        <Text className="font-['poppins-regular'] text-lg font-medium text-[#492800]">
+          {type === "location"
+            ? t("reservations.bookTable")
+            : t("reservations.myEvent")}
         </Text>
       </View>
-      {type === 'event' ? (
+      {type === "event" ? (
         <ProgressSteps {...progressStepsConfig}>
           <ProgressStep
             {...buttonConfig}
-            buttonNextText={t('reservations.continue')}
+            buttonNextText={t("reservations.continue")}
             buttonNextDisabled={!isEventFormValid}
-            label={t('reservations.type')}
+            label={t("reservations.type")}
           >
             <EventsStep />
           </ProgressStep>
 
           <ProgressStep
             {...buttonConfig}
-            buttonNextText={t('reservations.continue')}
-            buttonPreviousText={t('reservations.back')}
+            buttonNextText={t("reservations.continue")}
+            buttonPreviousText={t("reservations.back")}
             buttonNextDisabled={selectedLocationId === null}
-            label={t('reservations.location')}
+            label={t("reservations.location")}
           >
             <LocationsStep />
           </ProgressStep>
 
           <ProgressStep
             {...buttonConfig}
-            label={t('reservations.dateTime')}
-            buttonNextText={t('reservations.continue')}
-            buttonPreviousText={t('reservations.back')}
+            label={t("reservations.dateTime")}
+            buttonNextText={t("reservations.continue")}
+            buttonPreviousText={t("reservations.back")}
             buttonNextDisabled={!isDateFormValidForEvent}
           >
-            <DatePickerStep locationId={selectedLocationId} type='event' />
+            <DatePickerStep locationId={selectedLocationId} type="event" />
           </ProgressStep>
 
           <ProgressStep
             {...buttonConfig}
-            label={t('reservations.details')}
+            label={t("reservations.details")}
             buttonFinishText={
               isSubmitting
-                ? t('reservations.sending')
-                : t('reservations.reserve')
+                ? t("reservations.sending")
+                : t("reservations.reserve")
             }
-            buttonPreviousText={t('reservations.back')}
+            buttonPreviousText={t("reservations.back")}
             onSubmit={handleSubmit}
           >
             <DetailsStep />
@@ -352,33 +352,33 @@ ${
         <ProgressSteps {...progressStepsConfig}>
           <ProgressStep
             {...buttonConfig}
-            buttonNextText={t('reservations.continue')}
+            buttonNextText={t("reservations.continue")}
             buttonNextDisabled={selectedLocationId === null}
-            label={t('reservations.location')}
+            label={t("reservations.location")}
           >
             <LocationsStep />
           </ProgressStep>
 
           <ProgressStep
             {...buttonConfig}
-            label={t('reservations.dateTime')}
-            buttonNextText={t('reservations.continue')}
-            buttonPreviousText={t('reservations.back')}
+            label={t("reservations.dateTime")}
+            buttonNextText={t("reservations.continue")}
+            buttonPreviousText={t("reservations.back")}
             buttonNextDisabled={!isDateFormValidForLocation}
           >
-            <DatePickerStep locationId={selectedLocationId} type='location' />
+            <DatePickerStep locationId={selectedLocationId} type="location" />
           </ProgressStep>
 
           <ProgressStep
             onSubmit={handleSubmit}
             {...buttonConfig}
-            label={t('reservations.details')}
+            label={t("reservations.details")}
             buttonFinishText={
               isSubmitting
-                ? t('reservations.sending')
-                : t('reservations.reserve')
+                ? t("reservations.sending")
+                : t("reservations.reserve")
             }
-            buttonPreviousText={t('reservations.back')}
+            buttonPreviousText={t("reservations.back")}
           >
             <DetailsStep />
           </ProgressStep>

@@ -1,6 +1,5 @@
-import { View, Text, TouchableOpacity } from 'react-native';
-import React from 'react';
-import { useLanguage } from '@/hooks/useLanguage';
+import { View, Text, TouchableOpacity } from "react-native";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface YesNoSelectorProps {
   question: string;
@@ -15,45 +14,45 @@ export default function YesNoSelector({
 }: YesNoSelectorProps) {
   const { t } = useLanguage();
   return (
-    <View className='mb-6'>
-      <Text className="font-['poppins-medium'] text-sm text-[#492800] mb-4">
+    <View className="mb-6">
+      <Text className="mb-4 font-['poppins-medium'] text-sm text-[#492800]">
         {question}
       </Text>
 
-      <View className='flex flex-row justify-center items-center gap-6'>
+      <View className="flex flex-row items-center justify-center gap-6">
         {/* NU Button */}
         <TouchableOpacity
           onPress={() => onChange(false)}
-          className={`border rounded-xl px-10 py-4 ${
+          className={`rounded-xl border px-10 py-4 ${
             value === false
-              ? 'border-[#D38B5D] bg-[#D38B5D]'
-              : 'border-gray-100 bg-white'
+              ? "border-[#D38B5D] bg-[#D38B5D]"
+              : "border-gray-100 bg-white"
           }`}
         >
           <Text
-            className={`font-['poppins-medium'] text-base text-center ${
-              value === false ? 'text-white' : 'text-black'
+            className={`text-center font-['poppins-medium'] text-base ${
+              value === false ? "text-white" : "text-black"
             }`}
           >
-            {t('common.no')}
+            {t("common.no")}
           </Text>
         </TouchableOpacity>
 
         {/* DA Button */}
         <TouchableOpacity
           onPress={() => onChange(true)}
-          className={`rounded-xl px-10 py-4 flex-row items-center justify-center ${
+          className={`flex-row items-center justify-center rounded-xl px-10 py-4 ${
             value === true
-              ? 'bg-[#D38B5D] border border-[#D38B5D]'
-              : 'bg-white border border-gray-100'
+              ? "border border-[#D38B5D] bg-[#D38B5D]"
+              : "border border-gray-100 bg-white"
           }`}
         >
           <Text
-            className={`font-['poppins-medium'] text-base text-center ${
-              value === true ? 'text-white' : 'text-black'
+            className={`text-center font-['poppins-medium'] text-base ${
+              value === true ? "text-white" : "text-black"
             }`}
           >
-            {t('common.yes')}
+            {t("common.yes")}
           </Text>
         </TouchableOpacity>
       </View>

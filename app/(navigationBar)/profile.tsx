@@ -13,16 +13,15 @@ export default function Profile() {
 
   const handleLogout = async () => {
     try {
-      const result = await logoutUser();
-      // console.log("Logout result:", result);
+      await logoutUser();
     } catch (error: any) {
-      // console.log("Error logging out:", error.statusCode);
+      console.error("Error logging out:", error);
     }
   };
 
   return (
     <SafeAreaView
-      className="flex-1 px-5 bg-white"
+      className="flex-1 bg-white px-5"
       edges={["top", "left", "right"]}
     >
       {user ? (

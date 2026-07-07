@@ -1,10 +1,10 @@
-import { View, Text } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import FormInput from '@/components/auth/FormInput';
-import { useAuthStore } from '@/zustand/authStore';
-import { useEffect } from 'react';
-import { useDetailsReservationStore } from '@/zustand/detailsReservationStore';
-import { useLanguage } from '@/hooks/useLanguage';
+import { View, Text } from "react-native";
+import { useForm, useWatch } from "react-hook-form";
+import FormInput from "@/components/auth/FormInput";
+import { useAuthStore } from "@/zustand/authStore";
+import { useEffect } from "react";
+import { useDetailsReservationStore } from "@/zustand/detailsReservationStore";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface DetailsFormData {
   name: string;
@@ -16,62 +16,59 @@ export default function DetailsStep() {
   const { t } = useLanguage();
   const { user } = useAuthStore();
   const setDetails = useDetailsReservationStore((state) => state.setDetails);
-  const setSpecialRequirements = useDetailsReservationStore(
-    (state) => state.setSpecialRequirements
-  );
 
-  const { control, watch } = useForm<DetailsFormData>({
+  const { control } = useForm<DetailsFormData>({
     defaultValues: {
-      name: user?.name || '',
-      phone: user?.phone || '',
-      specialRequirements: '',
+      name: user?.name || "",
+      phone: user?.phone || "",
+      specialRequirements: "",
     },
   });
 
-  const specialReq = watch('specialRequirements');
+  const specialReq = useWatch({ name: "specialRequirements", control });
   useEffect(() => {
     setDetails({
-      name: user?.name || '',
-      phone: user?.phone || '',
-      specialRequirements: specialReq || '',
+      name: user?.name || "",
+      phone: user?.phone || "",
+      specialRequirements: specialReq || "",
     });
-  }, [specialReq, user]);
+  }, [specialReq, user, setDetails]);
 
   return (
-    <View className='flex-1'>
+    <View className="flex-1">
       {/* Readonly Name Field */}
-      <View className='mb-6'>
-        <Text className="font-['poppins-medium'] text-sm text-[#000000] mb-2">
-          {t('reservations.yourName')}
+      <View className="mb-6">
+        <Text className="mb-2 font-['poppins-medium'] text-sm text-[#000000]">
+          {t("reservations.yourName")}
         </Text>
-        <View className='border border-[#EBEBEB] rounded-[11px] px-3 py-3 bg-[#F8F8F8]'>
+        <View className="rounded-[11px] border border-[#EBEBEB] bg-[#F8F8F8] px-3 py-3">
           <Text className="font-['poppins-medium'] text-sm text-[#666666]">
-            {user?.name || ''}
+            {user?.name || ""}
           </Text>
         </View>
       </View>
 
       {/* Readonly Phone Field */}
-      <View className='mb-6'>
-        <Text className="font-['poppins-medium'] text-sm text-[#000000] mb-2">
-          {t('reservations.contactPhone')}
+      <View className="mb-6">
+        <Text className="mb-2 font-['poppins-medium'] text-sm text-[#000000]">
+          {t("reservations.contactPhone")}
         </Text>
-        <View className='border border-[#EBEBEB] rounded-[11px] px-3 py-3 bg-[#F8F8F8]'>
+        <View className="rounded-[11px] border border-[#EBEBEB] bg-[#F8F8F8] px-3 py-3">
           <Text className="font-['poppins-medium'] text-sm text-[#666666]">
-            {user?.phone || ''}
+            {user?.phone || ""}
           </Text>
         </View>
       </View>
 
       <FormInput
-        name='specialRequirements'
+        name="specialRequirements"
         control={control}
-        label={t('reservations.specialRequirements')}
-        placeholder={t('reservations.otherRequirementsInfo')}
+        label={t("reservations.specialRequirements")}
+        placeholder={t("reservations.otherRequirementsInfo")}
         multiline={true}
         numberOfLines={6}
-        className="w-full h-[126px] bg-white border border-[#E4E4E4] rounded-[14px] px-4 py-3 font-['poppins-medium'] text-sm text-[#000]"
-        textAlignVertical='top'
+        className="h-[126px] w-full rounded-[14px] border border-[#E4E4E4] bg-white px-4 py-3 font-['poppins-medium'] text-sm text-[#000]"
+        textAlignVertical="top"
       />
     </View>
   );

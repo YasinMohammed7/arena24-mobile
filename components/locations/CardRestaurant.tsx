@@ -7,20 +7,19 @@ import {
   Linking,
   Alert,
   ActionSheetIOS,
-} from 'react-native';
-import { useState, useEffect } from 'react';
-import { Copy } from 'lucide-react-native';
-import LocationOutline from '@/assets/carouselIcons/location.svg';
-import Clock from '@/assets/carouselIcons/clock-brown.svg';
-// import Star from "@/assets/carouselIcons/star.svg";
-import PhoneIcon from '@/assets/locations-icons/phone.svg';
-import GpsIcon from '@/assets/locations-icons/gps.svg';
-import { MapApp } from '@/types/mapTypes';
-import { Href, useRouter } from 'expo-router';
-import { LocationListItem } from '@/types/locations';
-import { checkScheduleAndOpenStatus } from '@/utils/scheduleUtils';
-import Clipboard from '@react-native-clipboard/clipboard';
-import { useLanguage } from '@/hooks/useLanguage';
+} from "react-native";
+import { useState, useEffect } from "react";
+import { Copy } from "lucide-react-native";
+import LocationOutline from "@/assets/carouselIcons/location.svg";
+import Clock from "@/assets/carouselIcons/clock-brown.svg";
+import PhoneIcon from "@/assets/locations-icons/phone.svg";
+import GpsIcon from "@/assets/locations-icons/gps.svg";
+import { MapApp } from "@/types/mapTypes";
+import { Href, useRouter } from "expo-router";
+import { LocationListItem } from "@/types/locations";
+import { checkScheduleAndOpenStatus } from "@/utils/scheduleUtils";
+import Clipboard from "@react-native-clipboard/clipboard";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export default function CardRestaurant({
   id,
@@ -35,21 +34,16 @@ export default function CardRestaurant({
 }: LocationListItem) {
   const router = useRouter();
   const { t } = useLanguage();
-  const [isCurrentlyOpen, setIsCurrentlyOpen] = useState(false);
-  const [currentSchedule, setCurrentSchedule] = useState<string>('');
-
-  // Function to update schedule and open status
-  const updateScheduleStatus = (): void => {
-    const { isCurrentlyOpen, currentSchedule } =
-      checkScheduleAndOpenStatus(schedule);
-    setIsCurrentlyOpen(isCurrentlyOpen);
-    setCurrentSchedule(currentSchedule);
-  };
+  const [currentSchedule, setCurrentSchedule] = useState(
+    () => checkScheduleAndOpenStatus(schedule).currentSchedule
+  );
 
   useEffect(() => {
-    updateScheduleStatus();
-    // Update every minute
-    const interval = setInterval(updateScheduleStatus, 60000);
+    const update = () =>
+      setCurrentSchedule(checkScheduleAndOpenStatus(schedule).currentSchedule);
+
+    update();
+    const interval = setInterval(update, 60000);
     return () => clearInterval(interval);
   }, [schedule]);
 
@@ -57,11 +51,12 @@ export default function CardRestaurant({
     if (address) {
       try {
         Clipboard.setString(address);
-        Alert.alert(t('common.success'), t('locations.addressCopied'));
+        Alert.alert(t("common.success"), t("locations.addressCopied"));
       } catch (error) {
+        console.error("Error copying address to clipboard:", error);
         Alert.alert(
-          t('reservations.error'),
-          t('locations.couldNotCopyAddress')
+          t("reservations.error"),
+          t("locations.couldNotCopyAddress")
         );
       }
     }
@@ -69,33 +64,33 @@ export default function CardRestaurant({
 
   const openMapsApp = async () => {
     if (!address) {
-      Alert.alert(t('reservations.error'), t('locations.noAddressAvailable'));
+      Alert.alert(t("reservations.error"), t("locations.noAddressAvailable"));
       return;
     }
 
     try {
-      if (Platform.OS === 'ios') {
+      if (Platform.OS === "ios") {
         // iOS: Create a custom action sheet with map apps
         const query = encodeURIComponent(address);
 
         const mapOptions: MapApp[] = [
           {
-            name: t('locations.openInAppleMaps'),
+            name: t("locations.openInAppleMaps"),
             url: `http://maps.apple.com/?q=${query}`,
           },
           {
-            name: t('locations.openInGoogleMaps'),
+            name: t("locations.openInGoogleMaps"),
             url: `https://maps.google.com/maps?q=${query}`,
           },
           {
-            name: t('locations.openInWaze'),
+            name: t("locations.openInWaze"),
             url: `waze://?q=${query}`,
           },
           {
-            name: t('locations.openInUber'),
+            name: t("locations.openInUber"),
             url: `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${query}`,
           },
-          { name: t('common.cancel'), url: null },
+          { name: t("common.cancel"), url: null },
         ];
 
         // Check which apps are available
@@ -108,6 +103,10 @@ export default function CardRestaurant({
                 availableApps.push(app);
               }
             } catch (error) {
+              console.error(
+                `Error checking availability for ${app.name}:`,
+                error
+              );
               console.log(`${app.name} not available`);
             }
           } else {
@@ -120,8 +119,8 @@ export default function CardRestaurant({
             {
               options: availableApps.map((app) => app.name),
               cancelButtonIndex: availableApps.length - 1,
-              title: name || t('locations.restaurant'),
-              message: t('locations.chooseApp'),
+              title: name || t("locations.restaurant"),
+              message: t("locations.chooseApp"),
             },
             (buttonIndex) => {
               if (buttonIndex < availableApps.length - 1) {
@@ -151,7 +150,7 @@ export default function CardRestaurant({
             return;
           }
         } catch (error) {
-          console.log('Geo scheme failed, trying alternative');
+          console.log("Geo scheme failed, trying alternative", error);
         }
 
         // Android fallback
@@ -165,8 +164,8 @@ export default function CardRestaurant({
         }
       }
     } catch (error) {
-      console.error('Error opening map:', error);
-      Alert.alert(t('reservations.error'), t('locations.couldNotOpenMapsApp'));
+      console.error("Error opening map:", error);
+      Alert.alert(t("reservations.error"), t("locations.couldNotOpenMapsApp"));
     }
   };
 
@@ -175,16 +174,16 @@ export default function CardRestaurant({
       onPress={() => {
         id && router.push(`/location/${id}` as Href);
       }}
-      className={`bg-white mb-5 border border-[#F1F1F1] rounded-[10px] w-full ${
-        Platform.OS === 'android' ? 'shadow-md' : ''
+      className={`mb-5 w-full rounded-[10px] border border-[#F1F1F1] bg-white ${
+        Platform.OS === "android" ? "shadow-md" : ""
       }`}
     >
       {/* Restaurant Image + Rating Badge */}
-      <View className='relative mb-4'>
+      <View className="relative mb-4">
         <Image
-          source={{ uri: imageUrl ?? '' }}
-          className='w-full h-48 rounded-t-[10px]'
-          resizeMode='cover'
+          source={{ uri: imageUrl ?? "" }}
+          className="h-48 w-full rounded-t-[10px]"
+          resizeMode="cover"
         />
         {/* <View className="absolute right-3 top-3 bg-[rgba(255,248,231,0.16)] border border-[rgba(255,255,255,0.27)] rounded-[23px] px-3 py-1.5 flex-row items-center gap-1">
           <Star width={12} height={12} color="#fff" />
@@ -195,12 +194,12 @@ export default function CardRestaurant({
       </View>
 
       {/* Restaurant Name */}
-      <Text className="font-['hotelResort'] text-xl font-bold text-[#492800] mb-1 ml-5">
+      <Text className="mb-1 ml-5 font-['hotelResort'] text-xl font-bold text-[#492800]">
         {name}
       </Text>
 
       {/* Category + Distance */}
-      <View className='flex-row items-center justify-between mb-3 ml-5 mr-5'>
+      <View className="mb-3 ml-5 mr-5 flex-row items-center justify-between">
         <Text className="font-['poppins-light'] text-sm text-[rgba(73,40,0,0.7)]">
           {experience}
         </Text>
@@ -210,28 +209,28 @@ export default function CardRestaurant({
       </View>
 
       {/* Address Row */}
-      <View className='flex-row items-center justify-between mb-2 ml-5 mr-5'>
-        <View className='flex-row items-center gap-2 flex-1'>
+      <View className="mb-2 ml-5 mr-5 flex-row items-center justify-between">
+        <View className="flex-1 flex-row items-center gap-2">
           <LocationOutline width={16} height={16} />
-          <Text className="font-['poppins-light'] text-sm text-[rgba(73,40,0,0.7)] flex-1">
+          <Text className="flex-1 font-['poppins-light'] text-sm text-[rgba(73,40,0,0.7)]">
             {address}
           </Text>
         </View>
-        <TouchableOpacity onPress={copyAddressToClipboard} className='p-1'>
-          <Copy size={16} color='rgba(73,40,0,0.7)' />
+        <TouchableOpacity onPress={copyAddressToClipboard} className="p-1">
+          <Copy size={16} color="rgba(73,40,0,0.7)" />
         </TouchableOpacity>
       </View>
 
       {/* Hours Row */}
-      <View className='flex-row items-center gap-2 mb-2 ml-5'>
+      <View className="mb-2 ml-5 flex-row items-center gap-2">
         <Clock width={16} height={16} />
         <Text className="font-['poppins-light'] text-sm text-[rgba(73,40,0,0.7)]">
-          {t('locations.openSchedule', { schedule: currentSchedule })}
+          {t("locations.openSchedule", { schedule: currentSchedule })}
         </Text>
       </View>
 
       {/* Phone Row */}
-      <View className='flex-row items-center gap-2 mb-3 ml-5'>
+      <View className="mb-3 ml-5 flex-row items-center gap-2">
         <PhoneIcon width={16} height={16} />
         <Text className="font-['poppins-light'] text-sm text-[rgba(73,40,0,0.7)]">
           {contact}
@@ -239,9 +238,9 @@ export default function CardRestaurant({
       </View>
 
       {/* Tags */}
-      <View className='flex-row flex-wrap gap-2 mb-4 ml-5 mr-5'>
+      <View className="mb-4 ml-5 mr-5 flex-row flex-wrap gap-2">
         {LocationFacility?.map((tag, index) => (
-          <View key={index} className='bg-[#D38B5D36] rounded-full px-3 py-1'>
+          <View key={index} className="rounded-full bg-[#D38B5D36] px-3 py-1">
             <Text className="font-['poppins-medium'] text-xs text-[#99621E]">
               {tag.facility.name}
             </Text>
@@ -250,24 +249,24 @@ export default function CardRestaurant({
       </View>
 
       {/* Buttons */}
-      <View className='flex-row gap-3 m-4'>
+      <View className="m-4 flex-row gap-3">
         <TouchableOpacity
-          className='flex-1 bg-transparent border border-[#EEEEEE] rounded-full py-3 items-center flex-row gap-2 justify-center'
+          className="flex-1 flex-row items-center justify-center gap-2 rounded-full border border-[#EEEEEE] bg-transparent py-3"
           onPress={openMapsApp}
         >
           <GpsIcon width={16} height={16} />
-          <Text className="text-[#99621E] font-['poppins-medium'] text-lg">
-            {t('locations.location')}
+          <Text className="font-['poppins-medium'] text-lg text-[#99621E]">
+            {t("locations.location")}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             id && router.push(`/location/${id}` as Href);
           }}
-          className='flex-1 bg-[#D38B5D] rounded-full py-3 items-center'
+          className="flex-1 items-center rounded-full bg-[#D38B5D] py-3"
         >
-          <Text className="text-white font-['poppins-medium'] text-lg">
-            {t('locations.choose')}
+          <Text className="font-['poppins-medium'] text-lg text-white">
+            {t("locations.choose")}
           </Text>
         </TouchableOpacity>
       </View>

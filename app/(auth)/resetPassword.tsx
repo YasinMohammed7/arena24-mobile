@@ -1,5 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
-import { useState, useEffect } from "react";
+import { View, Text } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +18,7 @@ const ResetPassword = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(getResetPasswordSchema()),
     mode: "onChange",
@@ -46,12 +45,12 @@ const ResetPassword = () => {
   return (
     <View className="flex-1 justify-center">
       {/* Title */}
-      <Text className="font-['Poppins-medium'] font-medium text-black text-center mb-2 text-lg">
+      <Text className="mb-2 text-center font-['Poppins-medium'] text-lg font-medium text-black">
         {t("auth.resetPasswordTitle")}
       </Text>
 
       {/* Subtitle */}
-      <Text className="font-['DM Sans'] text-sm font-light text-black text-center mb-6 px-4">
+      <Text className="font-['DM Sans'] mb-6 px-4 text-center text-sm font-light text-black">
         {t("auth.resetPasswordSubtitle")}
       </Text>
 
@@ -83,7 +82,7 @@ const ResetPassword = () => {
         text={t("auth.resetPasswordButton")}
         onPress={handleSubmit(handleResetPassword)}
         // disabled={!isValid}
-        className="rounded-[40px] py-3 items-center mb-6 flex-row justify-center bg-[#D38B5D]"
+        className="mb-6 flex-row items-center justify-center rounded-[40px] bg-[#D38B5D] py-3"
       />
 
       {/* Back Button */}

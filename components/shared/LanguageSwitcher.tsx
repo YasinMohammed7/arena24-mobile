@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, Animated } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { useLanguage } from "@/hooks/useLanguage";
 import { SUPPORTED_LANGUAGES, SupportedLanguage } from "@/types/i18n";
-import { ChevronDown } from "lucide-react-native";
 
 interface LanguageSwitcherProps {
   showLabels?: boolean;
@@ -22,7 +21,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         <TouchableOpacity
           key={lang.code}
           onPress={() => switchLanguage(lang.code)}
-          className={`px-4 py-2 rounded-lg ${
+          className={`rounded-lg px-4 py-2 ${
             currentLanguage === lang.code ? "bg-[#8B4513]" : "bg-gray-200"
           }`}
         >
@@ -43,10 +42,6 @@ export const FloatingLanguageSelector: React.FC = () => {
   const { currentLanguage, switchLanguage } = useLanguage();
   const [translateY] = useState(new Animated.Value(0));
   const [opacity] = useState(new Animated.Value(1));
-
-  const currentLang = SUPPORTED_LANGUAGES.find(
-    (lang) => lang.code === currentLanguage
-  );
 
   const handlePressIn = () => {
     Animated.parallel([
@@ -123,8 +118,8 @@ export const FloatingLanguageSelector: React.FC = () => {
             switchLanguage(item.code as SupportedLanguage);
           }}
           renderItem={(item) => (
-            <View className="flex-row items-center py-2.5 px-3">
-              <Text className="text-xl mr-2">{item.flag}</Text>
+            <View className="flex-row items-center px-3 py-2.5">
+              <Text className="mr-2 text-xl">{item.flag}</Text>
               <Text className="text-sm font-semibold text-[#492800]">
                 {item.code.toUpperCase()}
               </Text>

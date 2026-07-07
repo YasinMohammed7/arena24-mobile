@@ -8,8 +8,6 @@ import Animated, {
   withTiming,
   interpolate,
   LinearTransition,
-  SlideInDown,
-  SlideOutUp,
 } from "react-native-reanimated";
 
 export default function ReservationDropdown({
@@ -44,26 +42,26 @@ export default function ReservationDropdown({
   return (
     <Animated.View
       layout={LinearTransition.duration(300)}
-      className="bg-white border border-[#f1f1f1] rounded-2xl flex flex-col"
+      className="flex flex-col rounded-2xl border border-[#f1f1f1] bg-white"
     >
       <TouchableOpacity className="p-3" onPress={handlePress}>
         {/* Header: Icon, Text, and Arrow */}
-        <View className="flex flex-row justify-between items-center">
+        <View className="flex flex-row items-center justify-between">
           {/* Left side: Icon and Text */}
           <View className="flex flex-row items-center gap-2">
             {/* Icon Container */}
-            <View className="flex items-center justify-center w-6 h-6">
+            <View className="flex h-6 w-6 items-center justify-center">
               <Icon width={16} height={16} />
             </View>
 
             {/* Text */}
-            <Text className="text-[#492800] text-sm font-medium font-['poppins-medium']">
+            <Text className="font-['poppins-medium'] text-sm font-medium text-[#492800]">
               {text}
             </Text>
           </View>
 
           {/* Right side: Arrow Down with rotation animation */}
-          <View className="w-5 h-5 flex items-center justify-center">
+          <View className="flex h-5 w-5 items-center justify-center">
             <Animated.View style={chevronAnimatedStyle}>
               <ChevronDown size={18} color="#492800" strokeWidth={1.5} />
             </Animated.View>

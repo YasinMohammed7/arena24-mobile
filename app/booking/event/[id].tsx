@@ -5,18 +5,18 @@ import {
   ScrollView,
   Alert,
   Platform,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, MapPin } from 'lucide-react-native';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
-import { useEventsStore } from '@/zustand/eventsStore';
-import { useReservationsStore } from '@/zustand/reservationsStore';
-import FormInput from '@/components/auth/FormInput';
-import { createBookingSchema } from '@/schemas/authSchemas';
-import { useLanguage } from '@/hooks/useLanguage';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { ArrowLeft, MapPin } from "lucide-react-native";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useEventsStore } from "@/zustand/eventsStore";
+import { useReservationsStore } from "@/zustand/reservationsStore";
+import FormInput from "@/components/auth/FormInput";
+import { createBookingSchema } from "@/schemas/authSchemas";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export default function EventBookingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -40,28 +40,30 @@ export default function EventBookingScreen() {
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(createBookingSchema(event?.maxPeople ?? 999)),
     defaultValues: {
-      numberOfParticipants: '1',
-      specialRequirements: '',
+      numberOfParticipants: "1",
+      specialRequirements: "",
     },
   });
 
-  const numberOfParticipants = watch('numberOfParticipants');
-  const numericParticipants = parseInt(numberOfParticipants || '1', 10);
+  const numberOfParticipants = useWatch({
+    name: "numberOfParticipants",
+    control,
+  });
+  const numericParticipants = parseInt(numberOfParticipants || "1", 10);
 
   const totalPrice = numericParticipants * (event?.price ?? 0);
 
   const handleReservation = async (data: any) => {
     if (!event || !id) {
-      Alert.alert(t('common.error'), t('events.eventInfoUnavailable'));
+      Alert.alert(t("common.error"), t("events.eventInfoUnavailable"));
       return;
     }
 
-    const participants = parseInt(data.numberOfParticipants || '1', 10);
+    const participants = parseInt(data.numberOfParticipants || "1", 10);
 
     try {
       // Clear any previous errors
@@ -78,61 +80,68 @@ export default function EventBookingScreen() {
       await createEventReservation(reservationData);
     } catch (error) {
       // Error is handled in the store
-      console.error('Reservation error:', error);
+      console.error("Reservation error:", error);
     }
   };
 
   const handleCancel = () => {
-    router.back() ?? router.replace('/');
+    router.back() ?? router.replace("/");
   };
 
   // Handle reservation errors
   useEffect(() => {
     if (eventReservationError) {
-      Alert.alert(t('events.reservationError'), eventReservationError, [
+      Alert.alert(t("events.reservationError"), eventReservationError, [
         {
-          text: t('common.ok'),
+          text: t("common.ok"),
           onPress: () => clearErrors(),
         },
       ]);
     }
-  }, [eventReservationError, t]);
+  }, [eventReservationError, t, clearErrors]);
 
   // Handle reservation success
   useEffect(() => {
     if (eventReservationSuccess) {
       Alert.alert(
-        t('events.reservationSent'),
-        `${t('events.reservationFor')} ${numericParticipants} ${
-          numericParticipants === 1 ? t('events.person') : t('events.people')
-        } ${t('events.atEvent')} "${event?.name}" ${t('events.hasBeenSent')}`,
+        t("events.reservationSent"),
+        `${t("events.reservationFor")} ${numericParticipants} ${
+          numericParticipants === 1 ? t("events.person") : t("events.people")
+        } ${t("events.atEvent")} "${event?.name}" ${t("events.hasBeenSent")}`,
         [
           {
-            text: t('common.ok'),
+            text: t("common.ok"),
             onPress: () => {
               clearSuccess();
-              router.back() ?? router.replace('/');
+              router.back() ?? router.replace("/");
             },
           },
         ]
       );
     }
-  }, [eventReservationSuccess, event?.name, numericParticipants, t]);
+  }, [
+    eventReservationSuccess,
+    event?.name,
+    numericParticipants,
+    t,
+    clearSuccess,
+    router,
+  ]);
 
   // Error state
   if (errorDetail || !event) {
     return (
-      <SafeAreaView className='flex-1 bg-white'>
-        <View className='flex-1 justify-center items-center px-5'>
-          <Text className="font-['poppins-medium'] text-lg text-[#492800] mb-4">
-            {errorDetail || t('events.eventNotFound')}
+      <SafeAreaView className="flex-1 bg-white">
+        <View className="flex-1 items-center justify-center px-5">
+          <Text className="mb-4 font-['poppins-medium'] text-lg text-[#492800]">
+            {errorDetail || t("events.eventNotFound")}
           </Text>
           <TouchableOpacity
-            className='bg-[#D38B5D] rounded-[54px] px-6 py-3'
-            onPress={() => router.back() ?? router.replace('/')}
+            className="rounded-[54px] bg-[#D38B5D] px-6 py-3"
+            onPress={() => router.back() ?? router.replace("/")}
           >
             <Text className="font-['poppins-medium'] text-base text-white">
-              {t('common.back')}
+              {t("common.back")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -141,33 +150,33 @@ export default function EventBookingScreen() {
   }
 
   return (
-    <SafeAreaView className='flex-1 bg-[#FFFDFB]'>
+    <SafeAreaView className="flex-1 bg-[#FFFDFB]">
       {/* Scrollable Content */}
-      <View className='flex-1 px-5'>
+      <View className="flex-1 px-5">
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Header */}
-          <View className='flex flex-row items-center justify-center relative mb-4 mt-5'>
+          <View className="relative mb-4 mt-5 flex flex-row items-center justify-center">
             {/* Back Button - positioned to the left */}
             <TouchableOpacity
-              onPress={() => router.back() ?? router.replace('/')}
-              className='absolute z-10 left-0 bg-[#492800]/5 rounded-[30px] p-2'
+              onPress={() => router.back() ?? router.replace("/")}
+              className="absolute left-0 z-10 rounded-[30px] bg-[#492800]/5 p-2"
             >
-              <ArrowLeft size={20} color='#492800' />
+              <ArrowLeft size={20} color="#492800" />
             </TouchableOpacity>
 
-            <Text className="font-['hotel-resort'] text-lg text-[#492800] flex-1 text-center">
-              {t('reservations.title').toUpperCase()}
+            <Text className="flex-1 text-center font-['hotel-resort'] text-lg text-[#492800]">
+              {t("reservations.title").toUpperCase()}
             </Text>
           </View>
 
           {/* Event Info Section */}
-          <View className='flex-row items-stretch gap-2.5'>
-            <View className='flex-col items-center gap-1 flex-1'>
-              <Text className="font-['hotel-resort'] text-xl text-[#492800] text-center">
+          <View className="flex-row items-stretch gap-2.5">
+            <View className="flex-1 flex-col items-center gap-1">
+              <Text className="text-center font-['hotel-resort'] text-xl text-[#492800]">
                 {event.name}
               </Text>
-              <View className='flex-row items-center gap-1'>
-                <MapPin size={12} color='#492800' strokeWidth={1.5} />
+              <View className="flex-row items-center gap-1">
+                <MapPin size={12} color="#492800" strokeWidth={1.5} />
                 <Text className="font-['poppins-medium'] text-xs text-[#492800]">
                   {event.location.name}
                 </Text>
@@ -176,66 +185,66 @@ export default function EventBookingScreen() {
           </View>
 
           {/* Number of Participants */}
-          <View className='mt-8'>
+          <View className="mt-8">
             <FormInput
-              name='numberOfParticipants'
+              name="numberOfParticipants"
               control={control}
-              label={t('events.numberOfParticipants')}
-              placeholder={t('events.onePersonPlaceholder')}
+              label={t("events.numberOfParticipants")}
+              placeholder={t("events.onePersonPlaceholder")}
               error={errors.numberOfParticipants}
-              keyboardType='number-pad'
+              keyboardType="number-pad"
               selectTextOnFocus
               maxLength={maxLength}
               className={
-                Platform.OS === 'ios'
-                  ? "bg-white border border-[#E4E4E4] rounded-[14px] py-3 px-4 font-['poppins-medium'] text-sm text-[#000]"
+                Platform.OS === "ios"
+                  ? "rounded-[14px] border border-[#E4E4E4] bg-white px-4 py-3 font-['poppins-medium'] text-sm text-[#000]"
                   : undefined
               }
             />
           </View>
 
           {/* Special Requirements */}
-          <View className='mt-6 mb-8'>
+          <View className="mb-8 mt-6">
             <FormInput
-              name='specialRequirements'
+              name="specialRequirements"
               control={control}
-              label={t('reservations.specialRequests')}
-              placeholder={t('events.otherRequirements')}
+              label={t("reservations.specialRequests")}
+              placeholder={t("events.otherRequirements")}
               error={errors.specialRequirements}
               multiline
-              textAlignVertical='top'
-              className="bg-white border border-[#E4E4E4] rounded-[14px] h-32 px-4 py-4 font-['poppins-medium'] text-sm text-[#000]"
+              textAlignVertical="top"
+              className="h-32 rounded-[14px] border border-[#E4E4E4] bg-white px-4 py-4 font-['poppins-medium'] text-sm text-[#000]"
             />
           </View>
         </ScrollView>
       </View>
 
       {/* Fixed Bottom Section - Total & Buttons */}
-      <View className='bg-[#FFFDFB] px-5 pb-6 pt-4'>
+      <View className="bg-[#FFFDFB] px-5 pb-6 pt-4">
         {/* Price Section */}
-        <View className='flex-row justify-between items-end'>
+        <View className="flex-row items-end justify-between">
           <View>
-            <Text className="font-['poppins-medium'] text-lg text-[#492800] mb-1">
-              {t('events.total')}
+            <Text className="mb-1 font-['poppins-medium'] text-lg text-[#492800]">
+              {t("events.total")}
             </Text>
             <Text className="font-['poppins-light'] text-sm text-[#492800]">
-              {numericParticipants} x {event?.price || 150} {t('events.lei')}
+              {numericParticipants} x {event?.price || 150} {t("events.lei")}
             </Text>
           </View>
           <Text className="font-['poppins-medium'] text-lg text-[#492800]">
-            {totalPrice} {t('events.lei')}
+            {totalPrice} {t("events.lei")}
           </Text>
         </View>
 
         {/* Action Buttons */}
-        <View className='flex-row gap-3 mt-6'>
+        <View className="mt-6 flex-row gap-3">
           {/* Cancel Button */}
           <TouchableOpacity
             onPress={handleCancel}
-            className='flex-1 bg-white border border-[#CFCFCF] rounded-[54px] py-3 px-10 flex-row justify-center items-center'
+            className="flex-1 flex-row items-center justify-center rounded-[54px] border border-[#CFCFCF] bg-white px-10 py-3"
           >
             <Text className="font-['poppins-medium'] text-base text-[#616161]">
-              {t('events.cancel')}
+              {t("events.cancel")}
             </Text>
           </TouchableOpacity>
 
@@ -244,13 +253,13 @@ export default function EventBookingScreen() {
             onPress={handleSubmit(handleReservation)}
             disabled={isCreatingEventReservation}
             className={`flex-1 ${
-              isCreatingEventReservation ? 'bg-[#D38B5D]/50' : 'bg-[#D38B5D]'
-            } rounded-[54px] py-3 px-10 flex-row justify-center items-center`}
+              isCreatingEventReservation ? "bg-[#D38B5D]/50" : "bg-[#D38B5D]"
+            } flex-row items-center justify-center rounded-[54px] px-10 py-3`}
           >
             <Text className="font-['poppins-medium'] text-base text-white">
               {isCreatingEventReservation
-                ? t('events.processing')
-                : t('reservations.reserve')}
+                ? t("events.processing")
+                : t("reservations.reserve")}
             </Text>
           </TouchableOpacity>
         </View>

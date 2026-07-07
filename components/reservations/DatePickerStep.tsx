@@ -1,8 +1,15 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import { useForm } from "react-hook-form";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
+import { useForm, useWatch } from "react-hook-form";
 import FormInput from "@/components/auth/FormInput";
 import Checkbox from "@/components/shared/Checkbox";
-import SingleDateCalendar from "@/components/reservations/SingleDateCalendar";
+import SingleDateCalendarIOS from "@/components/reservations/SingleDateCalendar.ios";
+import SingleDateCalendarAndroid from "@/components/reservations/SingleDateCalendar.android";
 import PersonNumberSelector from "@/components/reservations/PersonNumberSelector";
 import { useLocationsStore } from "@/zustand/locationsStore";
 import { useDateReservationStore } from "@/zustand/dateReservationStore";
@@ -33,14 +40,14 @@ export default function DatePickerStep({
   } = useDateReservationStore();
 
   // Form for guest input
-  const { control, watch } = useForm({
+  const { control } = useForm({
     defaultValues: {
       guestInput,
     },
   });
 
   // Watch form changes and sync with store
-  const watchedGuestInput = watch("guestInput");
+  const watchedGuestInput = useWatch({ name: "guestInput", control });
   useEffect(() => {
     setGuestInput(watchedGuestInput || "");
   }, [watchedGuestInput, setGuestInput]);
@@ -50,7 +57,7 @@ export default function DatePickerStep({
     if (locationId) {
       setSelectedTimeSlotId(null);
     }
-  }, [locationId]);
+  }, [locationId, setSelectedTimeSlotId]);
   const location = useLocationsStore((state) =>
     locationId ? state.locations.find((loc) => loc.id === locationId) : null
   );
@@ -117,7 +124,7 @@ export default function DatePickerStep({
   // Function to generate hourly time slots (excluding last hour)
   const generateHourlySlots = (startTime: string, endTime: string) => {
     const slots: string[] = [];
-    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const [startHour] = startTime.split(":").map(Number);
     let [endHour, endMinute] = endTime.split(":").map(Number);
 
     // Handle midnight (00:00) as end of day (24:00)
@@ -126,7 +133,6 @@ export default function DatePickerStep({
     }
 
     let currentHour = startHour;
-    const startTotalMinutes = startHour * 60 + startMinute;
     const endTotalMinutes = endHour * 60 + endMinute;
 
     // Handle case where end time is next day (crosses midnight)
@@ -149,7 +155,7 @@ export default function DatePickerStep({
   return (
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       {/* Date Section */}
-      <Text className="font-['poppins-medium'] text-sm text-[#000000] mb-2">
+      <Text className="mb-2 font-['poppins-medium'] text-sm text-[#000000]">
         {t("reservations.numberOfGuests")}
       </Text>
       <View className="mb-5">
@@ -172,16 +178,24 @@ export default function DatePickerStep({
             />
           </View>
         )}
-        <SingleDateCalendar
-          onDateSelect={handleDateSelect}
-          selectedDate={selectedDate}
-          title={t("reservations.date")}
-        />
+        {Platform.OS === "android" ? (
+          <SingleDateCalendarAndroid
+            onDateSelect={handleDateSelect}
+            selectedDate={selectedDate}
+            title={t("reservations.date")}
+          />
+        ) : (
+          <SingleDateCalendarIOS
+            onDateSelect={handleDateSelect}
+            selectedDate={selectedDate}
+            title={t("reservations.date")}
+          />
+        )}
       </View>
 
       {type === "location" ? (
         <>
-          <Text className="font-['poppins-medium'] text-sm text-[#000000] mb-4">
+          <Text className="mb-4 font-['poppins-medium'] text-sm text-[#000000]">
             {t("reservations.time")}
           </Text>
           <ScrollView
@@ -227,10 +241,10 @@ export default function DatePickerStep({
                     <TouchableOpacity
                       key={`${timeSlot}-${index}`}
                       onPress={() => handleTimeSlotSelect(timeSlot)}
-                      className={`px-4 py-3 rounded-[14px] border ${
+                      className={`rounded-[14px] border px-4 py-3 ${
                         isSelected
-                          ? "bg-[#D38B5D] border-[#D38B5D]"
-                          : "bg-white border-gray-100"
+                          ? "border-[#D38B5D] bg-[#D38B5D]"
+                          : "border-gray-100 bg-white"
                       }`}
                     >
                       <Text

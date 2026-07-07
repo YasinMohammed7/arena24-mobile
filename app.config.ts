@@ -8,7 +8,6 @@ const config: ExpoConfig = {
   icon: "./assets/arena24-logo.png",
   scheme: "myapp",
   userInterfaceStyle: "light",
-  newArchEnabled: true,
   ios: {
     supportsTablet: false,
     bundleIdentifier: "com.sunnyasin.arena24",
@@ -57,12 +56,6 @@ const config: ExpoConfig = {
       foregroundImage: "./assets/android_icon.jpg",
       backgroundColor: "#ffffff",
     },
-    edgeToEdgeEnabled: false,
-    config: {
-      googleMaps: {
-        apiKey: process.env.GOOGLEMAPS_APIKEY,
-      },
-    },
     permissions: [
       "android.permission.ACCESS_COARSE_LOCATION",
       "android.permission.ACCESS_FINE_LOCATION",
@@ -75,6 +68,9 @@ const config: ExpoConfig = {
     favicon: "./assets/images/favicon.png",
   },
   plugins: [
+    "expo-image",
+    "expo-localization",
+    "expo-status-bar",
     "expo-router",
     [
       "expo-splash-screen",

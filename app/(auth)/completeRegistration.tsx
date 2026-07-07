@@ -1,14 +1,11 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthStore } from "@/zustand/authStore";
 import FormInput from "@/components/auth/FormInput";
 import PasswordInput from "@/components/auth/PasswordInput";
-import {
-  getCompleteRegistrationSchema,
-  CompleteRegistrationFormData,
-} from "@/schemas/authSchemas";
+import { getCompleteRegistrationSchema } from "@/schemas/authSchemas";
 import Button from "@/components/shared/Button";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -32,7 +29,6 @@ const CompleteRegistrationScreen = () => {
   const {
     control,
     handleSubmit,
-    watch,
     trigger,
     formState: { errors },
   } = useForm({
@@ -49,7 +45,7 @@ const CompleteRegistrationScreen = () => {
   });
 
   // Watch password field to compare with confirm password
-  const watchPassword = watch("password");
+  const watchPassword = useWatch({ name: "password", control });
 
   // Helper function to clear all errors when user types
   const clearErrorOnChange =
@@ -101,8 +97,8 @@ const CompleteRegistrationScreen = () => {
     <View>
       {/* Error Display */}
       {registrationError && (
-        <View className="mb-4 p-3 bg-red-50 rounded border border-red-200">
-          <Text className="text-red-600 text-sm text-center">
+        <View className="mb-4 rounded border border-red-200 bg-red-50 p-3">
+          <Text className="text-center text-sm text-red-600">
             {registrationError}
           </Text>
         </View>
@@ -110,8 +106,8 @@ const CompleteRegistrationScreen = () => {
 
       {/* Success Display */}
       {registrationSuccess && (
-        <View className="mb-4 p-3 bg-green-50 rounded border border-green-200">
-          <Text className="text-green-600 text-sm text-center">
+        <View className="mb-4 rounded border border-green-200 bg-green-50 p-3">
+          <Text className="text-center text-sm text-green-600">
             {t("auth.registeredSuccessfully")}
           </Text>
         </View>
@@ -119,10 +115,10 @@ const CompleteRegistrationScreen = () => {
 
       {/* Phone Number Display */}
       <View className="mb-6">
-        <Text className="font-['DM Sans'] text-sm font-light mb-2 ml-3 text-black">
+        <Text className="font-['DM Sans'] mb-2 ml-3 text-sm font-light text-black">
           {t("auth.phoneNumberConfirmed")}
         </Text>
-        <View className="border border-green-300 bg-green-50 rounded-[11px] px-3 py-3">
+        <View className="rounded-[11px] border border-green-300 bg-green-50 px-3 py-3">
           <Text className="font-['DM Sans'] text-sm font-medium text-green-700">
             {phone}
           </Text>
@@ -199,10 +195,10 @@ const CompleteRegistrationScreen = () => {
           isLoading
             ? t("auth.creatingAccount")
             : registrationSuccess
-            ? t("auth.redirecting")
-            : t("auth.createAccount")
+              ? t("auth.redirecting")
+              : t("auth.createAccount")
         }
-        className={`rounded-[40px] py-3 items-center mb-6 ${
+        className={`mb-6 items-center rounded-[40px] py-3 ${
           isLoading || registrationSuccess ? "bg-gray-400" : "bg-[#D38B5D]"
         }`}
         onPress={handleFormSubmit}
@@ -210,12 +206,12 @@ const CompleteRegistrationScreen = () => {
       />
 
       {/* Bottom Text */}
-      <View className="flex-row justify-center items-center">
+      <View className="flex-row items-center justify-center">
         <Text className="font-['DM Sans'] text-base font-light text-black">
           {t("auth.alreadyHaveAccountQuestion")}{" "}
         </Text>
         <TouchableOpacity onPress={() => router.push("/login")}>
-          <Text className="text-[#D38B5D] underline font-['DM Sans'] text-base font-light">
+          <Text className="font-['DM Sans'] text-base font-light text-[#D38B5D] underline">
             {t("auth.authenticate")}
           </Text>
         </TouchableOpacity>

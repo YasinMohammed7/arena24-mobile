@@ -1,5 +1,4 @@
-import { View, Text, ScrollView } from "react-native";
-import React from "react";
+import { View, ScrollView } from "react-native";
 import Button from "@/components/shared/Button";
 import { PersonNumberSelectorProps } from "@/types/personNumberSelector";
 
@@ -33,7 +32,7 @@ const PersonNumberSelector = ({
             key={number}
             text={number.toString()}
             onPress={() => handleNumberSelect(number)}
-            className={`w-12 h-12 rounded-full border border-gray-100 items-center justify-center ${
+            className={`h-12 w-12 items-center justify-center rounded-full border border-gray-100 ${
               selectedNumber === number ? "bg-[#D38B5D]" : "bg-white"
             }`}
             textStyle={`font-['poppins-medium'] text-sm ${
