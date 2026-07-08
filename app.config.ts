@@ -45,7 +45,7 @@ const config: ExpoConfig = {
           {
             scheme: "https",
             host: "arena-24.expo.app",
-            pathPrefix: "/*",
+            pathPrefix: "/",
           },
         ],
         category: ["BROWSABLE", "DEFAULT"],

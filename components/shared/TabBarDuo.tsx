@@ -1,7 +1,54 @@
-import { View, TouchableOpacity, Text } from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { Href, useRouter } from "expo-router";
 import { TabBarDuoProps } from "@/types/sharedComponents";
 import { useAuthStore } from "@/zustand/authStore";
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  tabBar: {
+    flexDirection: "row" as const,
+    backgroundColor: "#F5E6D7",
+    borderRadius: 37,
+    padding: 4,
+    minHeight: 40,
+  },
+  tab: {
+    flex: 1,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+    borderRadius: 37,
+    paddingVertical: 8,
+  },
+  tabActive: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "rgba(237,197,172,0.21)",
+  },
+  tabInactive: {
+    backgroundColor: "transparent",
+  },
+  tabText: {
+    fontFamily: "Poppins",
+    fontSize: 14,
+    textAlign: "center" as const,
+  },
+  tabTextActive: {
+    fontWeight: "500",
+  },
+  tabTextInactive: {
+    color: "rgba(73,40,0,0.7)",
+    fontWeight: "300",
+  },
+  title: {
+    fontFamily: "Poppins-medium",
+    fontWeight: "500",
+    color: "#000000",
+    textAlign: "center" as const,
+  },
+});
 
 const TabBarDuo = ({
   principalRoute,
@@ -36,54 +83,59 @@ const TabBarDuo = ({
     router.replace(`${routePrefix}/${tab}` as Href);
   };
 
+  const isPrincipalActive = activeTab === principalRoute;
+  const isSecondaryActive = activeTab === secondaryRoute;
+
   return (
     <>
       {/* Title - Only show if both title props are provided */}
       {principalTitle && secondaryTitle && (
-        <Text className="font-['Poppins-medium'] font-medium text-black text-center">
-          {activeTab === principalRoute ? principalTitle : secondaryTitle}
+        <Text style={styles.title}>
+          {isPrincipalActive ? principalTitle : secondaryTitle}
         </Text>
       )}
 
       {/* Custom Tab Bar */}
-      <View className="my-5">
-        <View className={`flex-row bg-[#F5E6D7] rounded-[37px] p-1 min-h-10`}>
+      <View style={styles.container}>
+        <View style={styles.tabBar}>
           <TouchableOpacity
-            className={`flex-1 items-center justify-center rounded-[37px] py-2 ${
-              activeTab === principalRoute
-                ? "bg-white border border-[rgba(237,197,172,0.21)]"
-                : "bg-transparent"
-            }`}
+            activeOpacity={1}
+            style={[
+              styles.tab,
+              isPrincipalActive ? styles.tabActive : styles.tabInactive,
+            ]}
             onPress={() =>
               handleTabPress(principalRoute, principalRequiresAuth)
             }
           >
             <Text
-              className={`font-['Poppins'] text-sm text-center ${
-                activeTab === principalRoute
-                  ? `text-[${textColor}] font-medium`
-                  : "text-[rgba(73,40,0,0.7)] font-light"
-              }`}
+              style={[
+                styles.tabText,
+                isPrincipalActive
+                  ? { ...styles.tabTextActive, color: textColor }
+                  : styles.tabTextInactive,
+              ]}
             >
               {principalText}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={`flex-1 items-center justify-center rounded-[37px] py-2 ${
-              activeTab === secondaryRoute
-                ? "bg-white border border-[rgba(237,197,172,0.21)]"
-                : "bg-transparent"
-            }`}
+            activeOpacity={1}
+            style={[
+              styles.tab,
+              isSecondaryActive ? styles.tabActive : styles.tabInactive,
+            ]}
             onPress={() =>
               handleTabPress(secondaryRoute, secondaryRequiresAuth)
             }
           >
             <Text
-              className={`font-['Poppins'] text-sm text-center ${
-                activeTab === secondaryRoute
-                  ? "text-[#99621E] font-medium"
-                  : "text-[rgba(73,40,0,0.7)] font-light"
-              }`}
+              style={[
+                styles.tabText,
+                isSecondaryActive
+                  ? { ...styles.tabTextActive, color: textColor }
+                  : styles.tabTextInactive,
+              ]}
             >
               {secondaryText}
             </Text>

@@ -139,7 +139,10 @@ export default function ReservationCardItem({
               <Users size={16} color="#99621E" strokeWidth={1.5} />
             </View>
             <Text className="font-['poppins-light'] text-sm text-[#492800B2]">
-              {people} {t("reservations.people")}
+              {people}{" "}
+              {people === 1
+                ? t("reservations.person")
+                : t("reservations.people")}
             </Text>
           </View>
         </View>

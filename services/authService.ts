@@ -1,4 +1,4 @@
-import apiClient from './api';
+import apiClient from "./api";
 import {
   RegisterUserData,
   LoginResponseData,
@@ -8,24 +8,24 @@ import {
   VerifyPhoneNumberData,
   VerifyPhoneNumberResponse,
   UpdateProfileData,
-} from '@/types/auth';
-import { LoginFormData } from '@/schemas/authSchemas';
-import i18n from '@/i18n/config';
+} from "@/types/auth";
+import { LoginFormData } from "@/schemas/authSchemas";
+import i18n from "@/i18n/config";
 // Custom API Error class to preserve HTTP response details
 
 class AuthService {
   // Test API connection
   async testConnection(): Promise<boolean> {
     try {
-      await apiClient.get('/api/health');
+      await apiClient.get("/api/health");
       return true;
     } catch (error: any) {
       const message =
         error.response?.data?.message ||
-        i18n.t('serviceErrors.connectionFailed');
+        i18n.t("serviceErrors.connectionFailed");
       const statusCode = error.response?.status || 0;
       const errorType =
-        error.response?.data?.error || i18n.t('serviceErrors.connectionFailed');
+        error.response?.data?.error || i18n.t("serviceErrors.connectionFailed");
       throw new CustomApiError(
         message,
         statusCode,
@@ -38,7 +38,7 @@ class AuthService {
   // Register user
   async register(userData: RegisterUserData): Promise<AuthResponse> {
     try {
-      const response = await apiClient.post('/api/auth/register', userData);
+      const response = await apiClient.post("/api/auth/register", userData);
       return {
         status: response.status,
         message: response.data.message,
@@ -48,11 +48,11 @@ class AuthService {
       // Preserve full HTTP error response details
       const message =
         error.response?.data?.message ||
-        i18n.t('serviceErrors.registrationFailed');
+        i18n.t("serviceErrors.registrationFailed");
       const statusCode = error.response?.status || 0;
       const errorType =
         error.response?.data?.error ||
-        i18n.t('serviceErrors.registrationFailed');
+        i18n.t("serviceErrors.registrationFailed");
       const details = error.response?.data;
 
       throw new CustomApiError(message, statusCode, errorType, details);
@@ -65,18 +65,18 @@ class AuthService {
   ): Promise<AuthResponse> {
     try {
       const response = await apiClient.post(
-        '/api/auth/send-verification',
+        "/api/auth/send-verification",
         sendVerificationCodeData
       );
       return { message: response.data.message };
     } catch (error: any) {
       const message =
         error.response?.data?.message ||
-        i18n.t('serviceErrors.phoneVerificationFailed');
+        i18n.t("serviceErrors.phoneVerificationFailed");
       const statusCode = error.response?.status || 0;
       const errorType =
         error.response?.data?.error ||
-        i18n.t('serviceErrors.phoneVerificationFailed');
+        i18n.t("serviceErrors.phoneVerificationFailed");
       const details = error.response?.data;
       throw new CustomApiError(message, statusCode, errorType, details);
     }
@@ -88,18 +88,18 @@ class AuthService {
   ): Promise<VerifyPhoneNumberResponse> {
     try {
       const response = await apiClient.post(
-        '/api/auth/verify-code',
+        "/api/auth/verify-code",
         verifyPhoneNumberData
       );
       return { message: response.data.message, valid: response.data.valid };
     } catch (error: any) {
       const message =
         error.response?.data?.message ||
-        i18n.t('serviceErrors.phoneVerificationFailed');
+        i18n.t("serviceErrors.phoneVerificationFailed");
       const statusCode = error.response?.status || 0;
       const errorType =
         error.response?.data?.error ||
-        i18n.t('serviceErrors.phoneVerificationFailed');
+        i18n.t("serviceErrors.phoneVerificationFailed");
       const details = error.response?.data;
       throw new CustomApiError(message, statusCode, errorType, details);
     }
@@ -108,7 +108,7 @@ class AuthService {
   // Login user
   async login(loginData: LoginFormData): Promise<LoginResponseData> {
     try {
-      const response = await apiClient.post('/api/auth/login', loginData);
+      const response = await apiClient.post("/api/auth/login", loginData);
       return {
         status: response.status,
         message: response.data.message,
@@ -118,10 +118,10 @@ class AuthService {
       };
     } catch (error: any) {
       const message =
-        error.response?.data?.message || i18n.t('serviceErrors.loginFailed');
+        error.response?.data?.message || i18n.t("serviceErrors.loginFailed");
       const statusCode = error.response?.status || 0;
       const errorType =
-        error.response?.data?.error || i18n.t('serviceErrors.loginFailed');
+        error.response?.data?.error || i18n.t("serviceErrors.loginFailed");
       throw new CustomApiError(
         message,
         statusCode,
@@ -134,17 +134,17 @@ class AuthService {
   // Logout user
   async logout(refreshToken: string): Promise<AuthResponse> {
     try {
-      const response = await apiClient.post('/api/auth/logout', {
+      const response = await apiClient.post("/api/auth/logout", {
         refreshToken,
       });
       return { status: response.status, message: response.data.message };
     } catch (error: any) {
       console.log(error.response?.data);
       const message =
-        error.response?.data?.message || i18n.t('serviceErrors.logoutFailed');
+        error.response?.data?.message || i18n.t("serviceErrors.logoutFailed");
       const statusCode = error.response?.status || 0;
       const errorType =
-        error.response?.data?.error || i18n.t('serviceErrors.logoutFailed');
+        error.response?.data?.error || i18n.t("serviceErrors.logoutFailed");
       throw new CustomApiError(
         message,
         statusCode,
@@ -155,10 +155,10 @@ class AuthService {
   }
 
   // Forgot password
-  async forgotPassword(phone: string): Promise<AuthResponse> {
+  async forgotPassword(email: string): Promise<AuthResponse> {
     try {
-      const response = await apiClient.post('/api/auth/forgot-password', {
-        phone,
+      const response = await apiClient.post("/api/auth/forgot-password", {
+        email,
       });
       return {
         status: response.status,
@@ -167,10 +167,10 @@ class AuthService {
     } catch (error: any) {
       const message =
         error.response?.data?.message ||
-        i18n.t('serviceErrors.resetPhoneFailed');
+        i18n.t("serviceErrors.resetPhoneFailed");
       const statusCode = error.response?.status || 0;
       const errorType =
-        error.response?.data?.error || i18n.t('serviceErrors.resetPhoneFailed');
+        error.response?.data?.error || i18n.t("serviceErrors.resetPhoneFailed");
       throw new CustomApiError(
         message,
         statusCode,
@@ -182,7 +182,7 @@ class AuthService {
 
   async refreshToken(refreshToken: string): Promise<LoginResponseData> {
     try {
-      const response = await apiClient.post('/api/auth/refresh-token', {
+      const response = await apiClient.post("/api/auth/refresh-token", {
         refreshToken,
       });
       return {
@@ -194,11 +194,11 @@ class AuthService {
     } catch (error: any) {
       const message =
         error.response?.data?.message ||
-        i18n.t('serviceErrors.tokenRefreshFailed');
+        i18n.t("serviceErrors.tokenRefreshFailed");
       const statusCode = error.response?.status || 0;
       const errorType =
         error.response?.data?.error ||
-        i18n.t('serviceErrors.tokenRefreshFailed');
+        i18n.t("serviceErrors.tokenRefreshFailed");
       throw new CustomApiError(
         message,
         statusCode,
@@ -214,15 +214,15 @@ class AuthService {
     try {
       const formData = new FormData();
       if (updateProfileData.name)
-        formData.append('name', updateProfileData.name);
+        formData.append("name", updateProfileData.name);
       if (updateProfileData.email)
-        formData.append('email', updateProfileData.email);
+        formData.append("email", updateProfileData.email);
       if (updateProfileData.picture) {
-        formData.append('picture', updateProfileData.picture as any);
+        formData.append("picture", updateProfileData.picture as any);
       }
 
       const response = await apiClient.patch(`/api/users`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { "Content-Type": "multipart/form-data" },
       });
       // console.log(response.data);
       return {
@@ -234,11 +234,11 @@ class AuthService {
       console.log(error.response?.data);
       const message =
         error.response?.data?.message ||
-        i18n.t('serviceErrors.profileUpdateFailed');
+        i18n.t("serviceErrors.profileUpdateFailed");
       const statusCode = error.response?.status || 0;
       const errorType =
         error.response?.data?.error ||
-        i18n.t('serviceErrors.profileUpdateFailed');
+        i18n.t("serviceErrors.profileUpdateFailed");
       throw new CustomApiError(
         message,
         statusCode,
@@ -256,11 +256,11 @@ class AuthService {
       console.log(error.response?.data);
       const message =
         error.response?.data?.message ||
-        i18n.t('serviceErrors.accountDeletionFailed');
+        i18n.t("serviceErrors.accountDeletionFailed");
       const statusCode = error.response?.status || 0;
       const errorType =
         error.response?.data?.error ||
-        i18n.t('serviceErrors.accountDeletionFailed');
+        i18n.t("serviceErrors.accountDeletionFailed");
       throw new CustomApiError(
         message,
         statusCode,

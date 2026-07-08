@@ -2,7 +2,10 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getPhoneSchema, PhoneFormData } from "@/schemas/authSchemas";
+import {
+  getEmailRegistrationSchema,
+  EmailRegistrationFormData,
+} from "@/schemas/authSchemas";
 import { useAuthStore } from "@/zustand/authStore";
 import Button from "@/components/shared/Button";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -22,27 +25,27 @@ const RegisterScreen = () => {
     handleSubmit,
     trigger,
     formState: { errors },
-  } = useForm<PhoneFormData>({
-    resolver: zodResolver(getPhoneSchema()),
+  } = useForm<EmailRegistrationFormData>({
+    resolver: zodResolver(getEmailRegistrationSchema()),
     mode: "all",
     reValidateMode: "onChange",
     defaultValues: {
-      phone: "",
+      email: "",
     },
   });
 
-  const onSubmit = async (data: PhoneFormData) => {
+  const onSubmit = async (data: EmailRegistrationFormData) => {
     try {
       // Clear any previous errors
       clearErrors();
 
       // Send verification code
-      await sendVerificationCode({ contact: data.phone });
+      await sendVerificationCode({ contact: data.email });
 
-      // Navigate to phone confirmation screen
+      // Navigate to confirmation screen
       router.push({
-        pathname: "/confirmPhone",
-        params: { phone: data.phone },
+        pathname: "/confirmCode",
+        params: { email: data.email },
       });
     } catch (error: any) {
       // Error is already handled in the store
@@ -60,42 +63,31 @@ const RegisterScreen = () => {
 
   return (
     <View>
-      {/* Error Message */}
-      {sendVerificationError && (
-        <View className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <Text className="font-['DM Sans'] text-sm text-red-600">
-            {sendVerificationError}
-          </Text>
-        </View>
-      )}
-
-      {/* Phone Number Input */}
+      {/* Email Input */}
       <View className="mb-8">
         <Text
-          className={`font-['DM Sans'] text-sm font-light mb-2 ml-3 ${
-            errors.phone || sendVerificationError
+          className={`font-['DM Sans'] mb-2 ml-3 text-sm font-light ${
+            errors.email || sendVerificationError
               ? "text-[#E50101]"
               : "text-black"
           }`}
         >
-          {errors.phone?.message || t("auth.phoneNumberRequired")}
+          {errors.email?.message || t("auth.email")}
         </Text>
-        <View className="flex-row items-center border border-[#EBEBEB] rounded-[11px] px-3">
-          {/* <Text className="font-['DM Sans'] text-sm font-medium text-black mr-3">
-            +40
-          </Text> */}
+        <View className="flex-row items-center rounded-[11px] border border-[#EBEBEB] px-3">
           <Controller
             control={control}
-            name="phone"
+            name="email"
             render={({ field: { onChange, value } }) => (
               <TextInput
-                className="flex-1 font-['DM Sans'] text-sm font-medium text-black py-3"
-                placeholder={t("auth.enterPhoneNumber")}
+                className="font-['DM Sans'] flex-1 py-3 text-sm font-medium text-black"
+                placeholder={t("auth.emailPlaceholder")}
                 placeholderTextColor="#B7B7B7"
                 value={value}
                 onChangeText={onChange}
-                keyboardType="phone-pad"
-                maxLength={20}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                maxLength={254}
               />
             )}
           />
@@ -104,30 +96,30 @@ const RegisterScreen = () => {
 
       {/* Error Message */}
       {sendVerificationError && (
-        <View className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <Text className="font-['DM Sans'] text-sm text-red-700 text-center">
+        <View className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3">
+          <Text className="font-['DM Sans'] text-center text-sm text-red-700">
             {sendVerificationError}
           </Text>
         </View>
       )}
 
-      {/* SMS Button */}
+      {/* Send Code Button */}
       <Button
-        text={isLoading ? t("auth.sendingSMS") : t("auth.sendSMSCode")}
+        text={isLoading ? t("auth.sendingCode") : t("auth.sendCode")}
         onPress={handleFormSubmit}
         disabled={isLoading}
-        className={`rounded-[40px] py-3 items-center mb-6 ${
+        className={`mb-6 items-center rounded-[40px] py-3 ${
           isLoading ? "bg-gray-400" : "bg-[#D38B5D]"
         }`}
       />
 
       {/* Bottom Text */}
-      <View className="flex-row justify-center items-center">
+      <View className="flex-row items-center justify-center">
         <Text className="font-['DM Sans'] text-base font-light text-black">
           {t("auth.alreadyHaveAccountQuestion")}{" "}
         </Text>
         <TouchableOpacity onPress={() => router.push("/login")}>
-          <Text className="text-[#D38B5D] underline font-['DM Sans'] text-base font-light">
+          <Text className="font-['DM Sans'] text-base font-light text-[#D38B5D] underline">
             {t("auth.authenticate")}
           </Text>
         </TouchableOpacity>

@@ -5,9 +5,9 @@ import MessageCodeField from "@/components/auth/MessageCodeField";
 import { useAuthStore } from "@/zustand/authStore";
 import { useLanguage } from "@/hooks/useLanguage";
 
-export default function ConfirmPhone() {
+export default function ConfirmCode() {
   const { t } = useLanguage();
-  const { phone } = useLocalSearchParams<{ phone?: string }>();
+  const { email } = useLocalSearchParams<{ email?: string }>();
   const {
     sendVerificationSuccess,
     setSendVerificationSuccess,
@@ -46,13 +46,13 @@ export default function ConfirmPhone() {
 
   const handleResend = async () => {
     // Immediately gate by isLoading and canResend
-    if (isLoading || !canResend || !phone) return;
+    if (isLoading || !canResend || !email) return;
 
     // Clear any previous errors and disable resend
     setLoading(true);
 
     try {
-      await sendVerificationCode({ contact: phone });
+      await sendVerificationCode({ contact: email });
       // Reset timer after successful resend
       setTimeLeft(60);
     } catch (error: any) {
@@ -73,20 +73,20 @@ export default function ConfirmPhone() {
     }
 
     try {
-      if (!phone) {
+      if (!email) {
         return;
       }
-      const response = await verifyPhoneNumber({ contact: phone, code });
+      const response = await verifyPhoneNumber({ contact: email, code });
 
       if (response.valid) {
         // Verification successful, redirect to complete registration
         router.push({
           pathname: "/completeRegistration",
-          params: { phone },
+          params: { email },
         });
       }
     } catch (error) {
-      console.error("Error verifying phone number:", error);
+      console.error("Error verifying code:", error);
     }
   };
 
@@ -96,25 +96,19 @@ export default function ConfirmPhone() {
       {sendVerificationSuccess && (
         <View className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3">
           <Text className="font-['DM Sans'] text-center text-sm text-green-700">
-            {t("auth.smsCodeSentSuccess")}
-            {phone
-              ? ` ${String(phone).slice(0, 3)}${"•".repeat(
-                  Math.max(0, String(phone).length - 6)
-                )}${String(phone).slice(-3)}`
-              : ""}
-            !
+            {t("auth.codeSentSuccess")} {email}!
           </Text>
         </View>
       )}
 
       {/* Header */}
       <Text className="mb-2 text-center font-['Poppins-medium'] text-black">
-        {t("auth.validatePhoneNumber")}
+        {t("auth.verifyCodeTitle")}
       </Text>
 
       {/* Subtitle */}
       <Text className="font-['DM Sans'] mb-6 px-4 text-center text-sm font-light text-black">
-        {t("auth.enterFourDigitCode")}
+        {t("auth.enterCode")}
       </Text>
 
       <MessageCodeField

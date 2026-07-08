@@ -1,18 +1,9 @@
-import { Schedule } from '@/types/locations';
-import i18n from '@/i18n/config';
+import { Schedule } from "@/types/locations";
+import i18n from "@/i18n/config";
 
-// Function to get current day using i18n
-export const getCurrentDay = (): string => {
-  const days = [
-    i18n.t('weekdays.sunday'),
-    i18n.t('weekdays.monday'),
-    i18n.t('weekdays.tuesday'),
-    i18n.t('weekdays.wednesday'),
-    i18n.t('weekdays.thursday'),
-    i18n.t('weekdays.friday'),
-    i18n.t('weekdays.saturday'),
-  ];
-  return days[new Date().getDay()];
+// Convert JS getDay() (0=Sunday ... 6=Saturday) to API format (1=Monday ... 7=Sunday)
+const jsDayToApiDay = (jsDay: number): number => {
+  return jsDay === 0 ? 7 : jsDay;
 };
 
 // Function to check if restaurant is currently open and get schedule
@@ -23,73 +14,21 @@ export const checkScheduleAndOpenStatus = (
   currentSchedule: string;
 } => {
   const now = new Date();
-  const currentDayIndex = new Date().getDay();
+  const currentApiDay = jsDayToApiDay(now.getDay());
   const currentTime = now.getHours() * 60 + now.getMinutes(); // Convert to minutes
 
-  // Get day names in all supported languages
-  const dayNamesInAllLanguages = {
-    0: ['Sunday', 'Duminică', 'Sonntag'], // Sunday
-    1: ['Monday', 'Luni', 'Montag'], // Monday
-    2: ['Tuesday', 'Marți', 'Dienstag'], // Tuesday
-    3: ['Wednesday', 'Miercuri', 'Mittwoch'], // Wednesday
-    4: ['Thursday', 'Joi', 'Donnerstag'], // Thursday
-    5: ['Friday', 'Vineri', 'Freitag'], // Friday
-    6: ['Saturday', 'Sâmbătă', 'Sambata', 'Samstag'], // Saturday
-  };
-
-  // Range names in all languages
-  const weekdayRanges = [
-    'Monday - Friday',
-    'Luni - Vineri',
-    'Montag - Freitag',
-  ];
-  const weekendRanges = [
-    'Saturday - Sunday',
-    'Sambata - Duminica',
-    'Sâmbătă - Duminică',
-    'Samstag - Sonntag',
-    'Weekend',
-    'Wochenende',
-  ];
-
-  // Find schedule for current day with better weekend handling
-  let todaySchedule = schedule.find((scheduleItem) => {
-    const dayOfWeek = scheduleItem.dayOfWeek;
-
-    // Direct day match - check if any translation of current day is in the schedule
-    const currentDayNames = dayNamesInAllLanguages[currentDayIndex];
-    if (currentDayNames.some((name) => dayOfWeek.includes(name))) {
-      return true;
-    }
-
-    // Weekday range handling (Monday - Friday)
-    const isWeekday = currentDayIndex >= 1 && currentDayIndex <= 5;
-    if (
-      isWeekday &&
-      weekdayRanges.some((range) => dayOfWeek.includes(range))
-    ) {
-      return true;
-    }
-
-    // Weekend range handling (Saturday - Sunday)
-    const isWeekend = currentDayIndex === 0 || currentDayIndex === 6;
-    if (
-      isWeekend &&
-      weekendRanges.some((range) => dayOfWeek.includes(range))
-    ) {
-      return true;
-    }
-
-    return false;
-  });
+  // Find schedule for today's dayOfWeek (API format: 1=Monday ... 7=Sunday)
+  const todaySchedule = schedule.find(
+    (scheduleItem) => scheduleItem.dayOfWeek === currentApiDay
+  );
 
   if (todaySchedule) {
     // Set current schedule display
     const currentSchedule = `${todaySchedule.startTime} - ${todaySchedule.endTime}`;
 
     // Check if currently open
-    const startTime = todaySchedule.startTime.split(':');
-    const endTime = todaySchedule.endTime.split(':');
+    const startTime = todaySchedule.startTime.split(":");
+    const endTime = todaySchedule.endTime.split(":");
     const startMinutes = parseInt(startTime[0]) * 60 + parseInt(startTime[1]);
     const endMinutes = parseInt(endTime[0]) * 60 + parseInt(endTime[1]);
 
@@ -106,7 +45,7 @@ export const checkScheduleAndOpenStatus = (
   } else {
     return {
       isCurrentlyOpen: false,
-      currentSchedule: i18n.t('homepage.closed'),
+      currentSchedule: i18n.t("homepage.closed"),
     };
   }
 };

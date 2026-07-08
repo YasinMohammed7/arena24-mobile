@@ -6,7 +6,7 @@ export default function ReservationsIndex() {
 
   useEffect(() => {
     // Redirect to locationsList by default when entering locations
-    router.replace("/(navigationBar)/(reservations)/reservationMake");
+    router.replace("/(navigationBar)/(reservations)/myReservations");
   }, [router]);
 
   return null; // This component doesn't render anything

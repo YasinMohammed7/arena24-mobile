@@ -44,7 +44,7 @@ export default function ReservationDropdown({
       layout={LinearTransition.duration(300)}
       className="flex flex-col rounded-2xl border border-[#f1f1f1] bg-white"
     >
-      <TouchableOpacity className="p-3" onPress={handlePress}>
+      <TouchableOpacity activeOpacity={1} className="p-3" onPress={handlePress}>
         {/* Header: Icon, Text, and Arrow */}
         <View className="flex flex-row items-center justify-between">
           {/* Left side: Icon and Text */}

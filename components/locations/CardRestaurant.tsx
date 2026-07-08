@@ -25,27 +25,27 @@ export default function CardRestaurant({
   id,
   name,
   address,
-  schedule,
+  schedules,
   experience,
   contact,
   imageUrl,
   isActive,
-  LocationFacility,
+  locationFacilities,
 }: LocationListItem) {
   const router = useRouter();
   const { t } = useLanguage();
   const [currentSchedule, setCurrentSchedule] = useState(
-    () => checkScheduleAndOpenStatus(schedule).currentSchedule
+    () => checkScheduleAndOpenStatus(schedules).currentSchedule
   );
 
   useEffect(() => {
     const update = () =>
-      setCurrentSchedule(checkScheduleAndOpenStatus(schedule).currentSchedule);
+      setCurrentSchedule(checkScheduleAndOpenStatus(schedules).currentSchedule);
 
     update();
     const interval = setInterval(update, 60000);
     return () => clearInterval(interval);
-  }, [schedule]);
+  }, [schedules]);
 
   const copyAddressToClipboard = () => {
     if (address) {
@@ -239,7 +239,7 @@ export default function CardRestaurant({
 
       {/* Tags */}
       <View className="mb-4 ml-5 mr-5 flex-row flex-wrap gap-2">
-        {LocationFacility?.map((tag, index) => (
+        {locationFacilities?.map((tag, index) => (
           <View key={index} className="rounded-full bg-[#D38B5D36] px-3 py-1">
             <Text className="font-['poppins-medium'] text-xs text-[#99621E]">
               {tag.facility.name}

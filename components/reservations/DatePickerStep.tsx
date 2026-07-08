@@ -79,46 +79,10 @@ export default function DatePickerStep({
     setSelectedTimeSlotId(timeSlot);
   };
 
-  // Function to get current day
-  const getCurrentDayInRomanian = () => {
-    const days = [
-      t("weekdays.sunday"),
-      t("weekdays.monday"),
-      t("weekdays.tuesday"),
-      t("weekdays.wednesday"),
-      t("weekdays.thursday"),
-      t("weekdays.friday"),
-      t("weekdays.saturday"),
-    ];
-    return days[new Date().getDay()];
-  };
-
-  // Function to check if current day matches schedule dayOfWeek
-  const isDayInSchedule = (dayOfWeek: string, currentDay: string) => {
-    // Handle ranges like "Luni - Vineri"
-    if (dayOfWeek.includes(" - ")) {
-      const [startDay, endDay] = dayOfWeek.split(" - ");
-      const dayOrder = [
-        t("weekdays.monday"),
-        t("weekdays.tuesday"),
-        t("weekdays.wednesday"),
-        t("weekdays.thursday"),
-        t("weekdays.friday"),
-        t("weekdays.saturday"),
-        t("weekdays.sunday"),
-      ];
-      const startIndex = dayOrder.indexOf(startDay);
-      const endIndex = dayOrder.indexOf(endDay);
-      const currentIndex = dayOrder.indexOf(currentDay);
-
-      if (startIndex <= endIndex) {
-        return currentIndex >= startIndex && currentIndex <= endIndex;
-      }
-      // Handle week wrap-around (e.g., Sâmbătă - Luni)
-      return currentIndex >= startIndex || currentIndex <= endIndex;
-    }
-    // Handle individual days or comma-separated days
-    return dayOfWeek.includes(currentDay);
+  // Get today's day index in API format: 1=Monday ... 7=Sunday
+  const getCurrentApiDay = (): number => {
+    const jsDay = new Date().getDay(); // 0=Sunday, 1=Monday ... 6=Saturday
+    return jsDay === 0 ? 7 : jsDay;
   };
 
   // Function to generate hourly time slots (excluding last hour)
@@ -206,10 +170,10 @@ export default function DatePickerStep({
           >
             <View className="flex flex-row gap-2">
               {(() => {
-                const currentDay = getCurrentDayInRomanian();
+                const currentApiDay = getCurrentApiDay();
                 const todaySchedules =
-                  location?.schedule.filter((schedule) =>
-                    isDayInSchedule(schedule.dayOfWeek, currentDay)
+                  location?.schedules.filter(
+                    (s) => s.dayOfWeek === currentApiDay
                   ) || [];
 
                 // Get all hourly slots from all matching schedules

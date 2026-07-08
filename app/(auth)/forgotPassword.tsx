@@ -38,12 +38,12 @@ const ForgotPassword = () => {
     setForgotPasswordSuccess(false);
   }, [setForgotPasswordError, setForgotPasswordSuccess]);
 
-  const handleSendPhone = async (data: ForgotPasswordFormData) => {
-    const response = await forgotPassword(data.phone);
+  const handleSendEmail = async (data: ForgotPasswordFormData) => {
+    const response = await forgotPassword(data.email);
     if (response) {
       router.push({
-        pathname: "/phoneSent",
-        params: { phone: data.phone },
+        pathname: "/codeSent",
+        params: { email: data.email },
       });
     }
   };
@@ -64,16 +64,16 @@ const ForgotPassword = () => {
         {t("auth.forgotPasswordSubtitle")}
       </Text>
 
-      {/* Phone Field */}
+      {/* Email Field */}
       <View className="mb-8">
         <FormInput
-          name="phone"
+          name="email"
           control={control}
-          label={t("auth.phoneNumberRequired")}
-          placeholder="0712345678"
-          keyboardType="phone-pad"
+          label={t("auth.email")}
+          placeholder={t("auth.emailPlaceholder")}
+          keyboardType="email-address"
           autoCapitalize="none"
-          error={errors.phone}
+          error={errors.email}
         />
       </View>
 
@@ -87,8 +87,8 @@ const ForgotPassword = () => {
       )}
 
       <Button
-        text={isLoading ? t("auth.sendingCode") : t("auth.sendRecoveryPhone")}
-        onPress={handleSubmit(handleSendPhone)}
+        text={isLoading ? t("auth.sendingCode") : t("auth.sendRecoveryEmail")}
+        onPress={handleSubmit(handleSendEmail)}
         disabled={!isValid || isLoading}
         className={`${
           isValid && !isLoading ? "bg-[#D38B5D]" : "bg-gray-400"

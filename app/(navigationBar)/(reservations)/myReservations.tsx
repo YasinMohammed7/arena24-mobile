@@ -12,16 +12,15 @@ import ReservationCardItem from "@/components/reservations/ReservationCardItem";
 import { useReservationsStore } from "@/zustand/reservationsStore";
 import { useAuthStore } from "@/zustand/authStore";
 import { ServerReservation } from "@/types/serverReservation";
-import { useEventsStore } from "@/zustand/eventsStore";
 import { useLanguage } from "@/hooks/useLanguage";
 
 export default function MyReservationsScreen() {
-  const [isActiveReservationsExpanded, setIsActiveReservationsExpanded] =
-    useState(false);
+  // const [isActiveReservationsExpanded, setIsActiveReservationsExpanded] =
+  // useState(false);
   const [isEventReservationsExpanded, setIsEventReservationsExpanded] =
-    useState(false);
+    useState(true);
   const [isPastReservationsExpanded, setIsPastReservationsExpanded] =
-    useState(false);
+    useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const { t, getLocale } = useLanguage();
   const locale = getLocale();
@@ -35,18 +34,15 @@ export default function MyReservationsScreen() {
   } = useReservationsStore();
   const { user } = useAuthStore();
 
-  const events = useEventsStore((state) => state.events);
-
-  // Fetch reservations on component mount
   useEffect(() => {
     if (user?.id) {
       getAllReservationsByUser(user.id);
     }
   }, [user?.id, getAllReservationsByUser]);
 
-  const handleActiveReservationsPress = () => {
-    setIsActiveReservationsExpanded(!isActiveReservationsExpanded);
-  };
+  // const handleActiveReservationsPress = () => {
+  //   setIsActiveReservationsExpanded(!isActiveReservationsExpanded);
+  // };
 
   const handleEventReservationsPress = () => {
     setIsEventReservationsExpanded(!isEventReservationsExpanded);
@@ -82,9 +78,9 @@ export default function MyReservationsScreen() {
       let displayTime = "TBD";
 
       if (isEventReservation && reservation.event) {
-        const event = events.find((event) => event.id === reservation.eventId);
-        // Event reservation
-        locationName = event?.location?.name || t("locations.unknownLocation");
+        // Event reservation — use reservation.location directly
+        locationName =
+          reservation.location?.name || t("locations.unknownLocation");
         title = reservation.event.name;
         displayDate = new Date(reservation.event.date).toLocaleDateString(
           locale,
@@ -100,7 +96,6 @@ export default function MyReservationsScreen() {
           {
             hour: "2-digit",
             minute: "2-digit",
-            timeZone: "UTC",
           }
         );
       } else {
@@ -150,16 +145,16 @@ export default function MyReservationsScreen() {
         note: reservation.details || undefined,
       };
     });
-  }, [reservations, events, locale, t]);
+  }, [reservations, locale, t]);
 
   // Filter reservations for active ones (restaurant with pending/confirmed status)
-  const activeReservations = useMemo(() => {
-    return mappedReservations.filter(
-      (reservation) =>
-        reservation.type === "location" &&
-        (reservation.status === "PENDING" || reservation.status === "CONFIRMED")
-    );
-  }, [mappedReservations]);
+  // const activeReservations = useMemo(() => {
+  //   return mappedReservations.filter(
+  //     (reservation) =>
+  //       reservation.type === "location" &&
+  //       (reservation.status === "PENDING" || reservation.status === "CONFIRMED")
+  //   );
+  // }, [mappedReservations]);
 
   // Filter reservations for events (active events only - not finished or cancelled)
   const eventReservations = useMemo(() => {
@@ -215,7 +210,12 @@ export default function MyReservationsScreen() {
       }
     >
       <View className="gap-4">
+        <Text className="text-center font-['hotel-resort'] text-lg text-[#492800]">
+          {t("reservations.myReservations")}
+        </Text>
+
         {/* Active Reservations Dropdown */}
+        {/* Active Reservations Dropdown
         <ReservationDropdown
           icon={BurgerIcon}
           text={t("reservations.activeReservations")}
@@ -234,6 +234,7 @@ export default function MyReservationsScreen() {
             )}
           </View>
         </ReservationDropdown>
+        */}
 
         {/* Event Reservations Dropdown */}
         <ReservationDropdown

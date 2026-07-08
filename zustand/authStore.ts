@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import authService from '@/services/authService';
+import { create } from "zustand";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import authService from "@/services/authService";
 import {
   RegisterUserData,
   AuthUser,
@@ -8,9 +8,9 @@ import {
   SendVerificationCodeData,
   VerifyPhoneNumberData,
   UpdateProfileData,
-} from '@/types/auth';
-import { LoginFormData } from '@/schemas/authSchemas';
-import i18n from '@/i18n/config';
+} from "@/types/auth";
+import { LoginFormData } from "@/schemas/authSchemas";
+import i18n from "@/i18n/config";
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   // Connection state
@@ -134,16 +134,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isLoading: false, registrationSuccess: true });
       return response;
     } catch (error: any) {
-      let errorMessage: string = '';
+      let errorMessage: string = "";
       switch (error.statusCode) {
         case 400:
-          errorMessage = i18n.t('authErrors.invalidData');
+          errorMessage = i18n.t("authErrors.invalidData");
           break;
         case 409:
-          errorMessage = i18n.t('authErrors.accountExists');
+          errorMessage = i18n.t("authErrors.accountExists");
           break;
         default:
-          errorMessage = i18n.t('authErrors.genericError');
+          errorMessage = i18n.t("authErrors.genericError");
           break;
       }
       set({ isLoading: false, registrationError: errorMessage });
@@ -168,16 +168,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isLoading: false, sendVerificationSuccess: true });
       return response;
     } catch (error: any) {
-      let errorMessage: string = '';
+      let errorMessage: string = "";
       switch (error.statusCode) {
         case 400:
-          errorMessage = i18n.t('authErrors.invalidPhone');
+          errorMessage = i18n.t("authErrors.invalidPhone");
           break;
         case 429:
-          errorMessage = i18n.t('authErrors.tooManyAttempts');
+          errorMessage = i18n.t("authErrors.tooManyAttempts");
           break;
         default:
-          errorMessage = i18n.t('authErrors.smsError');
+          errorMessage = i18n.t("authErrors.smsError");
           break;
       }
       set({ isLoading: false, sendVerificationError: errorMessage });
@@ -200,19 +200,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isLoading: false, verifyPhoneNumberSuccess: response.valid });
       return response;
     } catch (error: any) {
-      let errorMessage: string = '';
+      let errorMessage: string = "";
       switch (error.statusCode) {
         case 400:
-          errorMessage = i18n.t('authErrors.invalidCode');
+          errorMessage = i18n.t("authErrors.invalidCode");
           break;
         case 410:
-          errorMessage = i18n.t('authErrors.expiredCode');
+          errorMessage = i18n.t("authErrors.expiredCode");
           break;
         case 422:
-          errorMessage = i18n.t('authErrors.invalidCode');
+          errorMessage = i18n.t("authErrors.invalidCode");
           break;
         default:
-          errorMessage = i18n.t('authErrors.verificationError');
+          errorMessage = i18n.t("authErrors.verificationError");
           break;
       }
       set({ isLoading: false, verifyPhoneNumberError: errorMessage });
@@ -230,9 +230,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         try {
           // Store in AsyncStorage with error handling
           await AsyncStorage.multiSet([
-            ['accessToken', response.access_token],
-            ['refreshToken', response.refresh_token],
-            ['user', JSON.stringify(response.data)],
+            ["accessToken", response.access_token],
+            ["refreshToken", response.refresh_token],
+            ["user", JSON.stringify(response.data)],
           ]);
 
           set({
@@ -243,29 +243,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           });
         } catch (storageError) {
           console.error(
-            'Failed to save login data to AsyncStorage:',
+            "Failed to save login data to AsyncStorage:",
             storageError
           );
           // If storage fails, don't set authenticated state
           set({
             isLoading: false,
-            loginError: i18n.t('authErrors.saveFailed'),
+            loginError: i18n.t("authErrors.saveFailed"),
           });
           return false;
         }
       }
       return true;
     } catch (error: any) {
-      let errorMessage: string = '';
+      let errorMessage: string = "";
       switch (error.statusCode) {
         case 401:
-          errorMessage = i18n.t('authErrors.incorrectCredentials');
+          errorMessage = i18n.t("authErrors.incorrectCredentials");
           break;
         case 404:
-          errorMessage = i18n.t('authErrors.accountNotFound');
+          errorMessage = i18n.t("authErrors.accountNotFound");
           break;
         default:
-          errorMessage = i18n.t('authErrors.genericError');
+          errorMessage = i18n.t("authErrors.genericError");
           break;
       }
       set({ isLoading: false, loginError: errorMessage });
@@ -284,9 +284,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   initializeAuth: async () => {
     try {
       const [accessToken, refreshToken, userData] = await Promise.all([
-        AsyncStorage.getItem('accessToken'),
-        AsyncStorage.getItem('refreshToken'),
-        AsyncStorage.getItem('user'),
+        AsyncStorage.getItem("accessToken"),
+        AsyncStorage.getItem("refreshToken"),
+        AsyncStorage.getItem("user"),
       ]);
 
       if (accessToken && refreshToken && userData) {
@@ -297,9 +297,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
       }
     } catch (error) {
-      console.error('Error initializing auth:', error);
+      console.error("Error initializing auth:", error);
       // Clear any corrupt data
-      await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+      await AsyncStorage.multiRemove(["accessToken", "refreshToken", "user"]);
     }
   },
   // Logout method
@@ -307,14 +307,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true, logoutError: null });
 
     try {
-      console.log('Get refresh token');
-      const refreshToken = await AsyncStorage.getItem('refreshToken');
-      console.log('Refresh token', refreshToken);
+      console.log("Get refresh token");
+      const refreshToken = await AsyncStorage.getItem("refreshToken");
+      console.log("Refresh token", refreshToken);
       if (!refreshToken) {
         // Clear local data even if no refresh token
-        await AsyncStorage.removeItem('accessToken');
-        await AsyncStorage.removeItem('refreshToken');
-        await AsyncStorage.removeItem('user');
+        await AsyncStorage.removeItem("accessToken");
+        await AsyncStorage.removeItem("refreshToken");
+        await AsyncStorage.removeItem("user");
 
         set({
           isLoading: false,
@@ -323,22 +323,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
       }
 
-      const response = await authService.logout(refreshToken ?? '');
-      console.log('Logout response:', response);
+      const response = await authService.logout(refreshToken ?? "");
+      console.log("Logout response:", response);
       if (response.status === 200) {
         set({
           isLoading: false,
           isAuthenticated: false,
           user: null,
         });
-        await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+        await AsyncStorage.multiRemove(["accessToken", "refreshToken", "user"]);
       } else {
         set({
           isLoading: false,
           isAuthenticated: false,
           user: null,
         });
-        await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+        await AsyncStorage.multiRemove(["accessToken", "refreshToken", "user"]);
       }
 
       set({
@@ -347,23 +347,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         user: null,
       });
     } catch (error: any) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
       // Clear local data even if server logout fails
-      await AsyncStorage.removeItem('accessToken');
-      await AsyncStorage.removeItem('refreshToken');
-      await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem("accessToken");
+      await AsyncStorage.removeItem("refreshToken");
+      await AsyncStorage.removeItem("user");
 
       set({
         isLoading: false,
         isAuthenticated: false,
         user: null,
-        logoutError: i18n.t('authErrors.logoutError'),
+        logoutError: i18n.t("authErrors.logoutError"),
       });
     }
   },
 
   // Forgot password method
-  forgotPassword: async (phone: string) => {
+  forgotPassword: async (email: string) => {
     set({
       isLoading: true,
       forgotPasswordError: null,
@@ -371,20 +371,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
 
     try {
-      await authService.forgotPassword(phone);
+      await authService.forgotPassword(email);
       set({
         isLoading: false,
         forgotPasswordSuccess: true,
       });
       return true;
     } catch (error: any) {
-      let errorMessage: string = '';
+      let errorMessage: string = "";
       switch (error.statusCode) {
         case 404:
-          errorMessage = i18n.t('authErrors.phoneNotFound');
+          errorMessage = i18n.t("authErrors.phoneNotFound");
           break;
         default:
-          errorMessage = i18n.t('authErrors.genericError');
+          errorMessage = i18n.t("authErrors.genericError");
           break;
       }
       set({ isLoading: false, forgotPasswordError: errorMessage });
@@ -411,8 +411,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   validateAuthTokens: async () => {
     try {
       const [accessToken, refreshToken] = await Promise.all([
-        AsyncStorage.getItem('accessToken'),
-        AsyncStorage.getItem('refreshToken'),
+        AsyncStorage.getItem("accessToken"),
+        AsyncStorage.getItem("refreshToken"),
       ]);
 
       if (!accessToken || !refreshToken) {
@@ -420,7 +420,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           isAuthenticated: false,
           user: null,
         });
-        await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+        await AsyncStorage.multiRemove(["accessToken", "refreshToken", "user"]);
         return false;
       }
       return true;
@@ -429,7 +429,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isAuthenticated: false,
         user: null,
       });
-      await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+      await AsyncStorage.multiRemove(["accessToken", "refreshToken", "user"]);
       return false;
     }
   },
@@ -438,7 +438,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const { isAuthenticated, user } = get();
 
     if (!isAuthenticated || !user) {
-      const errorMessage = i18n.t('authErrors.notAuthenticated');
+      const errorMessage = i18n.t("authErrors.notAuthenticated");
       set({ updateProfileError: errorMessage });
       throw new Error(errorMessage);
     }
@@ -451,7 +451,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     try {
       const response = await authService.updateProfile(updateProfileData);
-      console.log('UpdateProfile response:', response);
+      console.log("UpdateProfile response:", response);
 
       // Actualizează datele user-ului în store cu noile date
       if (response.data) {
@@ -465,21 +465,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
 
         // Actualizează AsyncStorage
-        await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+        await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
         // console.log("Updated user saved in AsyncStorage", updatedUser)
       }
       return response;
     } catch (error: any) {
-      let errorMessage: string = '';
+      let errorMessage: string = "";
       switch (error.statusCode) {
         case 400:
-          errorMessage = i18n.t('authErrors.invalidData');
+          errorMessage = i18n.t("authErrors.invalidData");
           break;
         case 401:
-          errorMessage = i18n.t('authErrors.noPermissionUpdate');
+          errorMessage = i18n.t("authErrors.noPermissionUpdate");
           break;
         default:
-          errorMessage = i18n.t('authErrors.genericError');
+          errorMessage = i18n.t("authErrors.genericError");
           break;
       }
       set({ isLoadingProfile: false, updateProfileError: errorMessage });
@@ -498,7 +498,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const response = await authService.deleteAccount();
 
       // Clear AsyncStorage
-      await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+      await AsyncStorage.multiRemove(["accessToken", "refreshToken", "user"]);
 
       // Clear auth state in store immediately
       set({
@@ -510,24 +510,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       return response;
     } catch (error: any) {
-      let errorMessage: string = '';
+      let errorMessage: string = "";
       switch (error.statusCode) {
         case 400:
-          errorMessage = i18n.t('authErrors.noPermissionDelete');
+          errorMessage = i18n.t("authErrors.noPermissionDelete");
           break;
         case 401:
-          errorMessage = i18n.t('authErrors.noPermissionDelete');
+          errorMessage = i18n.t("authErrors.noPermissionDelete");
           break;
         case 403:
-          errorMessage = i18n.t('authErrors.noPermissionDelete');
+          errorMessage = i18n.t("authErrors.noPermissionDelete");
           break;
         default:
-          errorMessage = i18n.t('authErrors.genericError');
+          errorMessage = i18n.t("authErrors.genericError");
           break;
       }
 
       // Clear AsyncStorage and auth state even on error for security
-      await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+      await AsyncStorage.multiRemove(["accessToken", "refreshToken", "user"]);
       set({
         isLoadingDeleteAccount: false,
         deleteAccountError: errorMessage,

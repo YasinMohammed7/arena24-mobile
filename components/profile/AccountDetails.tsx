@@ -5,33 +5,31 @@ import {
   Image,
   TextInput,
   Alert,
-} from 'react-native';
-import { useState, useRef } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useAuthStore } from '@/zustand/authStore';
+  Linking,
+} from "react-native";
+import { useState, useRef } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useAuthStore } from "@/zustand/authStore";
 import {
-  ArrowLeft,
   Edit,
   FileText,
   Headphones,
   ChevronRight,
   DoorOpen,
   Trash2,
-} from 'lucide-react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import FormInput from '@/components/auth/FormInput';
-import Button from '@/components/shared/Button';
-import { useLanguage } from '@/hooks/useLanguage';
+} from "lucide-react-native";
+import * as ImagePicker from "expo-image-picker";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import FormInput from "@/components/auth/FormInput";
+import { useLanguage } from "@/hooks/useLanguage";
 
 // Validation schema - will be created dynamically with translations
 const createProfileSchema = (t: any) =>
   z.object({
-    name: z.string().min(2, t('profile.nameMinLength')),
-    email: z.string().email(t('profile.invalidEmail')),
+    name: z.string().min(2, t("profile.nameMinLength")),
+    email: z.string().email(t("profile.invalidEmail")),
   });
 
 type ProfileFormData = {
@@ -74,12 +72,11 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
     handleSubmit,
     formState: { errors },
     setValue,
-    reset,
   } = useForm<ProfileFormData>({
     resolver: zodResolver(createProfileSchema(t)),
     defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
+      name: user?.name || "",
+      email: user?.email || "",
     },
   });
 
@@ -89,7 +86,7 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
       await updateProfile({ name: data.name });
       setIsEditingName(false);
     } catch (error) {
-      console.log('Error updating name:', error);
+      console.log("Error updating name:", error);
     }
   };
 
@@ -98,7 +95,7 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
       await updateProfile({ email: data.email });
       setIsEditingEmail(false);
     } catch (error) {
-      console.log('Error updating email:', error);
+      console.log("Error updating email:", error);
     }
   };
 
@@ -110,7 +107,7 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
     } else {
       // Start editing
       setUpdateProfileError(null); // Clear any previous errors
-      setValue('name', user?.name || '');
+      setValue("name", user?.name || "");
       setIsEditingName(true);
 
       // Focus the input after state update
@@ -127,7 +124,7 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
     } else {
       // Start editing
       setUpdateProfileError(null); // Clear any previous errors
-      setValue('email', user?.email || '');
+      setValue("email", user?.email || "");
       setIsEditingEmail(true);
 
       // Focus the input after state update
@@ -138,13 +135,13 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
   };
 
   // Cancel editing
-  const cancelEdit = (field: 'name' | 'email') => {
+  const cancelEdit = (field: "name" | "email") => {
     setUpdateProfileError(null); // Clear any errors
-    if (field === 'name') {
-      setValue('name', user?.name || '');
+    if (field === "name") {
+      setValue("name", user?.name || "");
       setIsEditingName(false);
     } else {
-      setValue('email', user?.email || '');
+      setValue("email", user?.email || "");
       setIsEditingEmail(false);
     }
   };
@@ -153,12 +150,12 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
     try {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
+      if (status !== "granted") {
         return;
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ["images"],
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
@@ -171,8 +168,8 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
 
       const file = {
         uri: asset.uri,
-        name: asset.fileName ?? '',
-        type: asset.mimeType ?? '',
+        name: asset.fileName ?? "",
+        type: asset.mimeType ?? "",
       };
 
       await updateProfile({ picture: file });
@@ -183,33 +180,31 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
 
   // Handle menu actions
   const handleTermsPress = () => {
-    // TODO: Create terms and conditions page
-    console.log('Terms and conditions pressed');
+    Linking.openURL("https://csie.ase.ro/contact/");
   };
 
   const handleSupportPress = () => {
-    // TODO: Create customer support page
-    console.log('Customer support pressed');
+    Linking.openURL("tel:0730319951");
   };
 
   const handleLogout = async () => {
     Alert.alert(
-      t('profile.logoutConfirmTitle'),
-      t('profile.logoutConfirmMessage'),
+      t("profile.logoutConfirmTitle"),
+      t("profile.logoutConfirmMessage"),
       [
         {
-          text: t('common.cancel'),
-          style: 'cancel',
+          text: t("common.cancel"),
+          style: "cancel",
         },
         {
-          text: t('profile.logOut'),
-          style: 'destructive',
+          text: t("profile.logOut"),
+          style: "destructive",
           onPress: async () => {
             try {
               await logoutUser();
-              router.replace('/');
+              router.replace("/");
             } catch (error: any) {
-              console.log('Error logging out:', error);
+              console.log("Error logging out:", error);
             }
           },
         },
@@ -219,38 +214,38 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
 
   const handleDeleteAccount = async () => {
     Alert.alert(
-      t('profile.deleteAccountTitle'),
-      t('profile.deleteAccountMessage'),
+      t("profile.deleteAccountTitle"),
+      t("profile.deleteAccountMessage"),
       [
         {
-          text: t('common.cancel'),
-          style: 'cancel',
+          text: t("common.cancel"),
+          style: "cancel",
         },
         {
-          text: t('profile.deleteAccount'),
-          style: 'destructive',
+          text: t("profile.deleteAccount"),
+          style: "destructive",
           onPress: () => {
             // Double confirmation
             Alert.alert(
-              t('profile.finalConfirmation'),
-              t('profile.finalConfirmationMessage'),
+              t("profile.finalConfirmation"),
+              t("profile.finalConfirmationMessage"),
               [
                 {
-                  text: t('common.cancel'),
-                  style: 'cancel',
+                  text: t("common.cancel"),
+                  style: "cancel",
                 },
                 {
-                  text: t('profile.deletePermanently'),
-                  style: 'destructive',
+                  text: t("profile.deletePermanently"),
+                  style: "destructive",
                   onPress: async () => {
                     try {
                       await deleteAccount();
-                      router.replace('/');
+                      router.replace("/");
                     } catch (error: any) {
-                      console.log('Error deleting account:', error);
+                      console.log("Error deleting account:", error);
                       Alert.alert(
-                        t('reservations.error'),
-                        t('profile.couldNotDeleteAccount')
+                        t("reservations.error"),
+                        t("profile.couldNotDeleteAccount")
                       );
                     }
                   },
@@ -266,22 +261,22 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
   // Redirect if user is not authenticated or trying to access another user's profile
   if (!user || user.id !== id) {
     return (
-      <View className='flex-1 justify-center items-center'>
-        <Text className="text-lg font-['poppins-medium'] text-[#492800] mb-4">
-          {t('profile.noAccessToProfile')}
+      <View className="flex-1 items-center justify-center">
+        <Text className="mb-4 font-['poppins-medium'] text-lg text-[#492800]">
+          {t("profile.noAccessToProfile")}
         </Text>
         <TouchableOpacity
           onPress={() => {
             if (router.canGoBack()) {
               router.back();
             } else {
-              router.push('/');
+              router.push("/");
             }
           }}
-          className='bg-[#D38B5D] rounded-full px-6 py-3'
+          className="rounded-full bg-[#D38B5D] px-6 py-3"
         >
-          <Text className="text-white font-['poppins-medium'] text-base">
-            {t('common.back')}
+          <Text className="font-['poppins-medium'] text-base text-white">
+            {t("common.back")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -291,7 +286,7 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
   return (
     <>
       {/* Header */}
-      <View className='relative justify-center items-center py-4'>
+      <View className="relative items-center justify-center py-4">
         {/* Back Button - Absolute Left */}
         {/* <TouchableOpacity
           onPress={() => router.back()}
@@ -302,26 +297,26 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
 
         {/* Title - Absolute Centered */}
         <Text className="font-['poppins-medium'] text-lg text-[#492800]">
-          {t('profile.accountDetails')}
+          {t("profile.accountDetails")}
         </Text>
       </View>
 
       {/* Profile Avatar */}
-      <View className='items-center pt-6 pb-12'>
-        <View className='relative'>
-          <View className='w-[145px] h-[145px] rounded-full bg-[#D9D9D9] overflow-hidden'>
+      <View className="items-center pb-12 pt-6">
+        <View className="relative">
+          <View className="h-[145px] w-[145px] overflow-hidden rounded-full bg-[#D9D9D9]">
             {user.imageUrl ? (
               <Image
                 source={{
                   uri:
-                    (process.env.EXPO_PUBLIC_API_BASE_URL ?? '') +
+                    (process.env.EXPO_PUBLIC_API_BASE_URL ?? "") +
                     user.imageUrl,
                 }}
-                className='w-full h-full'
-                resizeMode='cover'
+                className="h-full w-full"
+                resizeMode="cover"
               />
             ) : (
-              <View className='w-full h-full bg-[#D9D9D9] items-center justify-center'>
+              <View className="h-full w-full items-center justify-center bg-[#D9D9D9]">
                 <Text className="font-['poppins-bold'] text-4xl text-[#999]">
                   {user.name.charAt(0).toUpperCase()}
                 </Text>
@@ -331,10 +326,10 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
 
           {/* Edit Icon */}
           <TouchableOpacity
-            className='absolute bottom-0 right-0 bg-white rounded-full p-1'
+            className="absolute bottom-0 right-0 rounded-full bg-white p-1"
             onPress={handleChangePhoto}
           >
-            <Edit size={22} color='#492800' />
+            <Edit size={22} color="#492800" />
           </TouchableOpacity>
         </View>
       </View>
@@ -342,16 +337,16 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
       {/* Form Fields */}
       <View>
         {/* Username Field */}
-        <View className={`${!isEditingName ? 'mb-6' : ''}`}>
-          <View className='flex-row justify-between items-center mb-2'>
-            <Text className="font-['poppins-medium'] text-xs text-[#492800] ml-4">
-              {!isEditingName ? t('profile.username') : ''}
+        <View className={`${!isEditingName ? "mb-6" : ""}`}>
+          <View className="mb-2 flex-row items-center justify-between">
+            <Text className="ml-4 font-['poppins-medium'] text-xs text-[#492800]">
+              {!isEditingName ? t("profile.username") : ""}
             </Text>
-            <View className='flex-row gap-2'>
+            <View className="flex-row gap-2">
               {isEditingName && (
-                <TouchableOpacity onPress={() => cancelEdit('name')}>
+                <TouchableOpacity onPress={() => cancelEdit("name")}>
                   <Text className="font-['poppins-medium'] text-xs text-[#E50101]">
-                    {t('common.cancel')}
+                    {t("common.cancel")}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -361,26 +356,26 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
               >
                 <Text
                   className={`font-['poppins-medium'] text-xs ${
-                    isLoadingProfile ? 'text-gray-400' : 'text-[#005E84]'
+                    isLoadingProfile ? "text-gray-400" : "text-[#005E84]"
                   }`}
                 >
                   {isEditingName
                     ? isLoadingProfile
-                      ? t('profile.saving')
-                      : t('common.save')
-                    : t('profile.change')}
+                      ? t("profile.saving")
+                      : t("common.save")
+                    : t("profile.change")}
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
           {isEditingName ? (
             <FormInput
-              name='name'
+              name="name"
               control={control}
-              label=''
-              placeholder={t('profile.enterName')}
+              label=""
+              placeholder={t("profile.enterName")}
               error={errors.name}
-              className="bg-white border border-[#E4E4E4] rounded-[14px] px-4 py-3 font-['poppins-medium'] text-sm text-[#492800]"
+              className="rounded-[14px] border border-[#E4E4E4] bg-white px-4 py-3 font-['poppins-medium'] text-sm text-[#492800]"
               inputRef={nameInputRef}
               clearErrorOnChange={(onChange) => (value) => {
                 setUpdateProfileError(null);
@@ -388,7 +383,7 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
               }}
             />
           ) : (
-            <View className='bg-white border border-[#E4E4E4] rounded-[14px] px-4 py-3'>
+            <View className="rounded-[14px] border border-[#E4E4E4] bg-white px-4 py-3">
               <Text className="font-['poppins-medium'] text-sm text-[#492800]">
                 {user.name}
               </Text>
@@ -397,10 +392,10 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
         </View>
 
         {/* Phone Field */}
-        <View className='mb-6'>
-          <View className='flex-row justify-between items-center mb-2'>
-            <Text className="font-['poppins-medium'] text-xs text-[#492800] ml-4">
-              {t('profile.phoneNumber')}
+        <View className="mb-6">
+          <View className="mb-2 flex-row items-center justify-between">
+            <Text className="ml-4 font-['poppins-medium'] text-xs text-[#492800]">
+              {t("profile.phoneNumber")}
             </Text>
             {/* <TouchableOpacity>
               <Text className="font-['poppins-medium'] text-xs text-[#005E84]">
@@ -408,8 +403,8 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
               </Text>
             </TouchableOpacity> */}
           </View>
-          <View className='bg-white border border-[#E4E4E4] rounded-[14px] px-4 py-3'>
-            <View className='flex-row'>
+          <View className="rounded-[14px] border border-[#E4E4E4] bg-white px-4 py-3">
+            <View className="flex-row">
               <Text className="font-['poppins-medium'] text-sm text-[#492800]">
                 {user.phone}
               </Text>
@@ -418,16 +413,16 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
         </View>
 
         {/* Email Field */}
-        <View className='mb-6'>
-          <View className='flex-row justify-between items-center mb-2'>
-            <Text className="font-['poppins-medium'] text-xs text-[#492800] ml-4">
-              {t('profile.email')}
+        <View className="mb-6">
+          <View className="mb-2 flex-row items-center justify-between">
+            <Text className="ml-4 font-['poppins-medium'] text-xs text-[#492800]">
+              {t("profile.email")}
             </Text>
-            <View className='flex-row gap-2'>
+            <View className="flex-row gap-2">
               {isEditingEmail && (
-                <TouchableOpacity onPress={() => cancelEdit('email')}>
+                <TouchableOpacity onPress={() => cancelEdit("email")}>
                   <Text className="font-['poppins-medium'] text-xs text-[#E50101]">
-                    {t('common.cancel')}
+                    {t("common.cancel")}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -437,28 +432,28 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
               >
                 <Text
                   className={`font-['poppins-medium'] text-xs ${
-                    isLoadingProfile ? 'text-gray-400' : 'text-[#005E84]'
+                    isLoadingProfile ? "text-gray-400" : "text-[#005E84]"
                   }`}
                 >
                   {isEditingEmail
                     ? isLoadingProfile
-                      ? t('profile.saving')
-                      : t('common.save')
-                    : t('profile.change')}
+                      ? t("profile.saving")
+                      : t("common.save")
+                    : t("profile.change")}
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
           {isEditingEmail ? (
             <FormInput
-              name='email'
+              name="email"
               control={control}
-              label=''
-              placeholder={t('profile.enterEmail')}
+              label=""
+              placeholder={t("profile.enterEmail")}
               error={errors.email}
-              className="bg-white border border-[#E4E4E4] rounded-[14px] px-4 py-3 font-['poppins-medium'] text-sm text-[#492800]"
-              keyboardType='email-address'
-              autoCapitalize='none'
+              className="rounded-[14px] border border-[#E4E4E4] bg-white px-4 py-3 font-['poppins-medium'] text-sm text-[#492800]"
+              keyboardType="email-address"
+              autoCapitalize="none"
               inputRef={emailInputRef}
               clearErrorOnChange={(onChange) => (value) => {
                 setUpdateProfileError(null);
@@ -466,65 +461,65 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
               }}
             />
           ) : (
-            <View className='bg-white border border-[#E4E4E4] rounded-[14px] px-4 py-3'>
+            <View className="rounded-[14px] border border-[#E4E4E4] bg-white px-4 py-3">
               <Text className="font-['poppins-medium'] text-sm text-[#492800]">
                 {user.email}
               </Text>
             </View>
           )}
           {updateProfileError && (isEditingName || isEditingEmail) && (
-            <Text className="font-['poppins-medium'] text-xs text-[#E50101] mt-2 ml-4">
+            <Text className="ml-4 mt-2 font-['poppins-medium'] text-xs text-[#E50101]">
               {updateProfileError}
             </Text>
           )}
         </View>
 
         {/* Menu Options */}
-        <View className='mt-8'>
-          <View className='bg-white rounded-[16px] p-y'>
+        <View className="mt-8">
+          <View className="p-y rounded-[16px] bg-white">
             {/* Termeni și Condiții */}
             <TouchableOpacity
               onPress={handleTermsPress}
-              className='flex-row justify-between items-center py-4'
+              className="flex-row items-center justify-between py-4"
             >
-              <View className='flex-row items-center flex-1'>
-                <FileText size={22} color='#492800' strokeWidth={2} />
-                <Text className="font-['poppins-medium'] text-base text-[#492800] ml-4">
-                  {t('profile.terms')}
+              <View className="flex-1 flex-row items-center">
+                <FileText size={22} color="#492800" strokeWidth={2} />
+                <Text className="ml-4 font-['poppins-medium'] text-base text-[#492800]">
+                  {t("profile.terms")}
                 </Text>
               </View>
-              <ChevronRight size={18} color='#434343' strokeWidth={1.5} />
+              <ChevronRight size={18} color="#434343" strokeWidth={1.5} />
             </TouchableOpacity>
 
             {/* Separator */}
-            <View className='w-full h-px bg-gray-200' />
+            <View className="h-px w-full bg-gray-200" />
 
             {/* Customer Support */}
             <TouchableOpacity
               onPress={handleSupportPress}
-              className='flex-row justify-between items-center py-4'
+              className="flex-row items-center justify-between py-4"
             >
-              <View className='flex-row items-center flex-1'>
-                <Headphones size={22} color='#492800' strokeWidth={2} />
-                <Text className="font-['poppins-medium'] text-base text-[#492800] ml-4">
-                  {t('profile.customerSupport')}
+              <View className="flex-1 flex-row items-center">
+                <Headphones size={22} color="#492800" strokeWidth={2} />
+                <Text className="ml-4 font-['poppins-medium'] text-base text-[#492800]">
+                  {t("profile.customerSupport")}
                 </Text>
               </View>
-              <ChevronRight size={18} color='#434343' strokeWidth={1.5} />
+              <ChevronRight size={18} color="#434343" strokeWidth={1.5} />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Action Buttons */}
-        <View className='mt-8 space-y-3'>
+        <View className="mt-8 space-y-3">
           {/* Logout Button */}
           <TouchableOpacity
             onPress={handleLogout}
-            className='bg-white rounded-[16px] py-4 flex-row items-center'
+            className="flex-row items-center rounded-[16px] bg-white py-4"
           >
-            <DoorOpen size={22} color='#D38B5D' strokeWidth={2} />
-            <Text className="font-['poppins-medium'] text-base text-[#D38B5D] ml-4">
-              {t('profile.logOut')}
+            <DoorOpen size={22} color="#D38B5D" strokeWidth={2} />
+            <Text className="ml-4 font-['poppins-medium'] text-base text-[#D38B5D]">
+              {t("profile.logOut")}
             </Text>
           </TouchableOpacity>
 
@@ -532,21 +527,21 @@ export default function AccountDetails({ userId }: AccountDetailsProps = {}) {
           <TouchableOpacity
             onPress={handleDeleteAccount}
             disabled={isLoadingDeleteAccount}
-            className={`bg-white rounded-[16px] py-4 flex-row items-center ${
-              isLoadingDeleteAccount ? 'opacity-50' : ''
+            className={`flex-row items-center rounded-[16px] bg-white py-4 ${
+              isLoadingDeleteAccount ? "opacity-50" : ""
             }`}
           >
-            <Trash2 size={22} color='#E53E3E' strokeWidth={2} />
-            <Text className="font-['poppins-medium'] text-base text-[#E53E3E] ml-4">
+            <Trash2 size={22} color="#E53E3E" strokeWidth={2} />
+            <Text className="ml-4 font-['poppins-medium'] text-base text-[#E53E3E]">
               {isLoadingDeleteAccount
-                ? t('profile.deletingAccount')
-                : t('profile.deleteAccount')}
+                ? t("profile.deletingAccount")
+                : t("profile.deleteAccount")}
             </Text>
           </TouchableOpacity>
 
           {/* Delete Account Error */}
           {deleteAccountError && (
-            <Text className="font-['poppins-medium'] text-xs text-[#E50101] mt-2 ml-4">
+            <Text className="ml-4 mt-2 font-['poppins-medium'] text-xs text-[#E50101]">
               {deleteAccountError}
             </Text>
           )}

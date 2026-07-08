@@ -11,7 +11,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 
 const CompleteRegistrationScreen = () => {
   const { t } = useLanguage();
-  const { phone } = useLocalSearchParams<{ phone: string }>();
+  const { email } = useLocalSearchParams<{ email: string }>();
 
   // Get register method and loading state from Auth store with selectors for performance
   const registerUser = useAuthStore((state) => state.registerUser);
@@ -38,7 +38,7 @@ const CompleteRegistrationScreen = () => {
     defaultValues: {
       first_name: "",
       last_name: "",
-      email: "",
+      phone: "",
       password: "",
       confirmPassword: "",
     },
@@ -57,19 +57,19 @@ const CompleteRegistrationScreen = () => {
     };
 
   const onSubmit = async (data: any): Promise<void> => {
-    // Format data for API (exclude confirmPassword, include phone from params)
-    const { first_name, last_name, email, password } = data;
+    // Format data for API (exclude confirmPassword, include email from params)
+    const { first_name, last_name, phone, password } = data;
     const formattedData = {
       name: `${first_name} ${last_name}`.trim(),
-      email: email.trim(),
+      email: (email as string) || "",
       password,
-      phone: (phone as string) || "",
+      phone: phone || "",
     };
     try {
       const response = await registerUser(formattedData);
       if (response.status === 201) {
         const loginData = {
-          email: formattedData.email.trim(),
+          email: (email as string).trim(),
           password: formattedData.password,
         };
 
@@ -113,14 +113,14 @@ const CompleteRegistrationScreen = () => {
         </View>
       )}
 
-      {/* Phone Number Display */}
+      {/* Email Confirmed Display */}
       <View className="mb-6">
         <Text className="font-['DM Sans'] mb-2 ml-3 text-sm font-light text-black">
-          {t("auth.phoneNumberConfirmed")}
+          {t("auth.emailConfirmed")}
         </Text>
         <View className="rounded-[11px] border border-green-300 bg-green-50 px-3 py-3">
           <Text className="font-['DM Sans'] text-sm font-medium text-green-700">
-            {phone}
+            {email}
           </Text>
         </View>
       </View>
@@ -149,17 +149,15 @@ const CompleteRegistrationScreen = () => {
         autoCorrect={false}
       />
 
-      {/* Email Input */}
+      {/* Phone Input */}
       <FormInput
-        name="email"
+        name="phone"
         control={control}
-        label={t("auth.emailAddress")}
-        placeholder={t("auth.emailPlaceholder2")}
-        error={errors.email}
+        label={t("auth.phoneNumberRequired")}
+        placeholder={t("auth.enterPhoneNumber")}
+        error={errors.phone}
         clearErrorOnChange={clearErrorOnChange}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
+        keyboardType="phone-pad"
       />
 
       {/* Password Input */}

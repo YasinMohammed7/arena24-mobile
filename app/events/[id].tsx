@@ -136,14 +136,12 @@ export default function EventDetailScreen() {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
-      timeZone: "UTC",
     }
   );
   const formattedEndHour = new Date(event.endHour).toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-    timeZone: "UTC",
   });
 
   return (
@@ -268,15 +266,19 @@ export default function EventDetailScreen() {
                   </View>
                 </View>
 
-                {/* Participants */}
+                {/* Free Spots */}
                 <View className="flex-row items-start gap-2">
                   <Users size={16} color="#492800" strokeWidth={1.5} />
                   <View className="flex-col gap-2">
                     <Text className="font-['poppins-medium'] text-xs text-[rgba(73,40,0,0.7)]">
-                      {t("events.participants")}
+                      {t("events.freeSpots")}
                     </Text>
                     <Text className="font-['poppins-light'] text-sm text-[rgba(73,40,0,0.7)]">
+                      {event.maxPeople - event.reservationCount} /{" "}
                       {event.maxPeople}
+                    </Text>
+                    <Text className="font-['poppins-light'] text-xs text-[rgba(73,40,0,0.5)]">
+                      {event.reservationCount} {t("events.reservations")}
                     </Text>
                   </View>
                 </View>
@@ -314,7 +316,7 @@ export default function EventDetailScreen() {
               {t("events.facilities")}
             </Text>
             <View className="flex-row flex-wrap gap-2">
-              {selectedLocation?.LocationFacility?.map((locationFacility) => (
+              {selectedLocation?.locationFacilities?.map((locationFacility) => (
                 <View
                   key={locationFacility.id}
                   className="rounded-[35px] bg-[rgba(211,139,93,0.21)] px-2.5 py-1"
@@ -330,35 +332,36 @@ export default function EventDetailScreen() {
           {/* What's Included & Requirements */}
           <View className="mb-6 flex-col gap-4">
             {/* What's Included Section */}
-            {event.includedOptions && event.includedOptions.length > 0 && (
-              <View className="flex-col gap-2">
-                <Text className="font-['poppins-medium'] text-sm text-[#492800]">
-                  {t("events.whatsIncluded")}
-                </Text>
+            {event.eventIncludedOptions &&
+              event.eventIncludedOptions.length > 0 && (
                 <View className="flex-col gap-2">
-                  {event.includedOptions.map((option) => (
-                    <View
-                      key={option.id}
-                      className="flex-row items-center gap-2.5"
-                    >
-                      <CheckCircle size={18} color="#fff" fill="#00AC47" />
-                      <Text className="font-['poppins-light'] text-sm text-black">
-                        {option.name}
-                      </Text>
-                    </View>
-                  ))}
+                  <Text className="font-['poppins-medium'] text-sm text-[#492800]">
+                    {t("events.whatsIncluded")}
+                  </Text>
+                  <View className="flex-col gap-2">
+                    {event.eventIncludedOptions.map((option) => (
+                      <View
+                        key={option.id}
+                        className="flex-row items-center gap-2.5"
+                      >
+                        <CheckCircle size={18} color="#fff" fill="#00AC47" />
+                        <Text className="font-['poppins-light'] text-sm text-black">
+                          {option.name}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
                 </View>
-              </View>
-            )}
+              )}
 
             {/* What's Required Section */}
-            {event.requirements && event.requirements.length > 0 && (
+            {event.eventRequirements && event.eventRequirements.length > 0 && (
               <View className="flex-col gap-2">
                 <Text className="font-['poppins-medium'] text-sm text-[#492800]">
                   {t("events.whatsRequired")}
                 </Text>
                 <View className="flex-col gap-2">
-                  {event.requirements.map((requirement) => (
+                  {event.eventRequirements.map((requirement) => (
                     <View
                       key={requirement.id}
                       className="flex-row items-center gap-2.5"
@@ -375,29 +378,27 @@ export default function EventDetailScreen() {
           </View>
 
           {/* Action Buttons */}
-          <View>
-            <TouchableOpacity
-              className="flex-row items-center justify-center gap-2 rounded-[54px] bg-[#D38B5D] px-10 py-3"
-              onPress={() => {
-                // Check if user is authenticated
-                if (!isAuthenticated) {
-                  // Set redirect path and go to login
-                  setRedirectAfterLogin(`/booking/event/${id}`);
-                  router.push("/login");
-                  return;
-                }
-
-                router.push(`/booking/event/${id}` as Href);
-              }}
-            >
-              <Text className="font-['poppins-medium'] text-base text-white">
-                {t("events.makeReservation")}
-              </Text>
-              <ArrowRight size={24} color="#FFFFFF" strokeWidth={1.5} />
-            </TouchableOpacity>
-          </View>
         </View>
       </ScrollView>
+
+      {/* Sticky Bottom Reservation */}
+      <View className="px-5 py-3">
+        <TouchableOpacity
+          className="w-full flex-row items-center justify-center rounded-[54px] bg-[#D38B5D] px-4 py-3"
+          onPress={() => {
+            if (!isAuthenticated) {
+              setRedirectAfterLogin(`/booking/event/${id}`);
+              router.push("/login");
+              return;
+            }
+            router.push(`/booking/event/${id}` as Href);
+          }}
+        >
+          <Text className="font-['poppins-medium'] text-base text-white">
+            {t("events.makeReservation")}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
